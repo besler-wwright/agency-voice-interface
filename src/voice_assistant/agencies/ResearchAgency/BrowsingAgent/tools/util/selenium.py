@@ -21,6 +21,7 @@ def get_web_driver():
         raise ImportError
 
     try:
+        # type: ignore
         from webdriver_manager.chrome import ChromeDriverManager
 
         print("webdriver_manager imported successfully.")
