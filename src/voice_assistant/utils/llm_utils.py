@@ -40,9 +40,7 @@ async def get_model_completion(prompt: str, model: ModelName) -> str:
             return result["choices"][0]["message"]["content"]
 
 
-async def get_structured_output_completion(
-    prompt: str, response_format: BaseModel
-) -> BaseModel:
+async def get_structured_output_completion(prompt: str, response_format: BaseModel) -> BaseModel:
     completion = await asyncio.to_thread(
         OPENAI_CLIENT.beta.chat.completions.parse,
         model=ModelName.BASE_MODEL.value,
