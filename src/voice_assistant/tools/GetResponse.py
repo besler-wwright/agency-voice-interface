@@ -96,6 +96,8 @@ class GetResponse(BaseTool):
             return "System Notification: 'No response found from the agent.'"
 
     def _get_last_run(self, thread: Thread) -> Optional[Any]:
+        if not thread.id:
+            return None
         runs = self._client.beta.threads.runs.list(
             thread_id=thread.id,
             order="desc",
