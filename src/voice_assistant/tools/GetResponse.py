@@ -7,8 +7,7 @@ from agency_swarm.agents import Agent
 from agency_swarm.threads import Thread
 from agency_swarm.tools import BaseTool
 from openai import OpenAI
-
-from openai.types.beta.thread_messages import TextContentBlock
+from openai.types.beta.threads import TextContentBlock
 from pydantic import Field, PrivateAttr, field_validator
 
 from voice_assistant.agencies import AGENCIES, AGENCIES_AND_AGENTS_STRING
