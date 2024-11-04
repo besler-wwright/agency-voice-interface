@@ -62,4 +62,7 @@ async def parse_chat_completion(prompt: str, model: ModelName) -> str:
         model=model.value,
         messages=[{"role": "user", "content": prompt}],
     )
-    return completion.choices[0].message.content
+    content = completion.choices[0].message.content
+    if content is None:
+        raise ValueError("No content received from OpenAI API")
+    return content
