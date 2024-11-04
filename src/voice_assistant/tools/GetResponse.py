@@ -8,7 +8,7 @@ from agency_swarm.threads import Thread
 from agency_swarm.tools import BaseTool
 from openai import OpenAI
 
-# from openai.types.beta.thread_messages import TextContentBlock
+from openai.types.beta.thread_messages import TextContentBlock
 from pydantic import Field, PrivateAttr, field_validator
 
 from voice_assistant.agencies import AGENCIES, AGENCIES_AND_AGENTS_STRING
@@ -97,11 +97,12 @@ class GetResponse(BaseTool):
 
         if messages.data and messages.data[0].content:
             content_block = messages.data[0].content[0]
-            if content_block:
-                response_text = content_block.text.value  # type: ignore
-                return f"{self.agent_name}'s Response: '{response_text}'"
-            else:
-                return "System Notification: 'Message content is not in text format'"
+            if isinstance(content_block, TextContentBlock):
+                text = content_block.text
+                if text and text.value:  # Add null check for text and text.value
+                    response_text = text.value
+                    return f"{self.agent_name}'s Response: '{response_text}'"
+            return "System Notification: 'Message content is not in text format or is empty'"
         else:
             return "System Notification: 'No response found from the agent.'"
 
