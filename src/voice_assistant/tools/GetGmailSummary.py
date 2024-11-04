@@ -3,7 +3,7 @@ import base64
 import logging
 import re
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import List
 from googleapiclient.discovery import Resource
 
 from agency_swarm.tools import BaseTool

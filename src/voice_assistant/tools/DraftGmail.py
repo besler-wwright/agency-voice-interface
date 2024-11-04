@@ -3,7 +3,7 @@ import base64
 import os
 from datetime import datetime
 from email.mime.text import MIMEText
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 from googleapiclient.discovery import Resource
 
 from agency_swarm.tools import BaseTool
