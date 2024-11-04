@@ -39,9 +39,7 @@ class ClickElement(BaseTool):
                 all_elements[self.element_number - 1].click()
             except Exception as e:
                 if "element click intercepted" in str(e).lower():
-                    wd.execute_script(
-                        "arguments[0].click();", all_elements[self.element_number - 1]
-                    )
+                    wd.execute_script("arguments[0].click();", all_elements[self.element_number - 1])
                 else:
                     raise e
 

@@ -2,9 +2,12 @@ import asyncio
 import json
 import logging
 import os
+import sys
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor
 from enum import Enum
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
 from agency_swarm.tools import BaseTool
 from pydantic import Field
@@ -22,9 +25,7 @@ browser = personalization["browser"]
 class OpenBrowser(BaseTool):
     """Open a browser with a specified URL."""
 
-    chain_of_thought: str = Field(
-        ..., description="Step-by-step thought process to determine the URL to open."
-    )
+    chain_of_thought: str = Field(..., description="Step-by-step thought process to determine the URL to open.")
     url: str = Field(..., description="The URL to open")
 
     @timeit_decorator
