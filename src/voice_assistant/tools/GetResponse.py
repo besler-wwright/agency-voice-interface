@@ -87,6 +87,9 @@ class GetResponse(BaseTool):
         if run.status == "failed":
             return f"System Notification: 'Agent run failed with error: {run.last_error.message}. " "You may send another message with the 'SendMessageAsync' tool.'"
 
+        if not thread.id:
+            return "System Notification: 'Thread ID is missing'"
+
         messages = await asyncio.to_thread(self._client.beta.threads.messages.list, thread_id=thread.id, order="desc")
 
         if messages.data and messages.data[0].content:
