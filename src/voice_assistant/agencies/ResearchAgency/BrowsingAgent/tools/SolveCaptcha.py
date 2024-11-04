@@ -67,7 +67,7 @@ class SolveCaptcha(BaseTool):
             tiles = wd.find_elements(By.CLASS_NAME, "rc-imageselect-tile")
 
             # filter out tiles that have been selected
-            tiles = [tile for tile in tiles if "selected" not in tile.get_attribute("class").lower()]
+            tiles = [tile for tile in tiles if "selected" not in (tile.get_attribute("class") or "").lower()]
 
             image_content = []
             i = 0
