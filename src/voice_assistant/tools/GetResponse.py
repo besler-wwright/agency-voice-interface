@@ -67,7 +67,9 @@ class GetResponse(BaseTool):
         Returns:
             str: The result message based on the task status.
         """
-        agency: Agency = AGENCIES.get(self.agency_name)
+        agency = AGENCIES.get(self.agency_name)
+        if not agency:
+            return f"Error: Agency '{self.agency_name}' not found"
 
         # Determine the thread based on agent_name
         if not self.agent_name or self.agent_name == agency.ceo.name:
