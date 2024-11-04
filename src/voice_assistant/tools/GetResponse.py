@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Any, Optional
 
-from openai.types.beta.threads.thread_message import TextContentBlock, ImageFileContentBlock
+from openai.types.beta.thread_messages import TextContentBlock, ImageFileContentBlock
 from agency_swarm import Agency, get_openai_client
 from agency_swarm.agents import Agent
 from agency_swarm.threads import Thread
