@@ -85,7 +85,8 @@ class GetResponse(BaseTool):
             return "System Notification: 'Task is not completed yet. Please tell the user to wait " "and try again later.'"
 
         if run.status == "failed":
-            return f"System Notification: 'Agent run failed with error: {run.last_error.message}. " "You may send another message with the 'SendMessageAsync' tool.'"
+            error_message = run.last_error.message if run.last_error else "Unknown error"
+            return f"System Notification: 'Agent run failed with error: {error_message}. " "You may send another message with the 'SendMessageAsync' tool.'"
 
         if not thread.id:
             return "System Notification: 'Thread ID is missing'"
