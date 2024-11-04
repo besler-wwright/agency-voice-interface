@@ -94,8 +94,12 @@ class GetResponse(BaseTool):
         messages = await asyncio.to_thread(self._client.beta.threads.messages.list, thread_id=thread.id, order="desc")
 
         if messages.data and messages.data[0].content:
-            response_text = messages.data[0].content[0].text.value  # type: ignore
-            return f"{self.agent_name}'s Response: '{response_text}'"
+            message_content = messages.data[0].content[0].text
+            if message_content and message_content.value:  # Add null check
+                response_text = message_content.value
+                return f"{self.agent_name}'s Response: '{response_text}'"
+            else:
+                return "System Notification: 'Message content is empty or malformed'"
         else:
             return "System Notification: 'No response found from the agent.'"
 
