@@ -31,7 +31,7 @@ class BrowsingAgent(Agent):
         self.prev_message = ""
 
     @override
-    def response_validator(self, message):
+    def response_validator(self, message: str):
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support.select import Select
 
@@ -45,9 +45,7 @@ class BrowsingAgent(Agent):
         filtered_message = re.sub(r"\[.*?\]", "", message).strip()
 
         if filtered_message and self.prev_message == filtered_message:
-            raise ValueError(
-                "Do not repeat yourself. If you are stuck, try a different approach or search in google for the page you are looking for directly."
-            )
+            raise ValueError("Do not repeat yourself. If you are stuck, try a different approach or search in google for the page you are looking for directly.")
 
         self.prev_message = filtered_message
 
@@ -61,13 +59,11 @@ class BrowsingAgent(Agent):
             wd = get_web_driver()
             highlight_elements_with_labels(
                 wd,
-                'a, button, div[onclick], div[role="button"], div[tabindex], '
-                'span[onclick], span[role="button"], span[tabindex]',
+                'a, button, div[onclick], div[role="button"], div[tabindex], ' 'span[onclick], span[role="button"], span[tabindex]',
             )
             self._shared_state.set(
                 "elements_highlighted",
-                'a, button, div[onclick], div[role="button"], div[tabindex], '
-                'span[onclick], span[role="button"], span[tabindex]',
+                'a, button, div[onclick], div[role="button"], div[tabindex], ' 'span[onclick], span[role="button"], span[tabindex]',
             )
 
             self.take_screenshot()
@@ -82,9 +78,7 @@ class BrowsingAgent(Agent):
 
             element_texts_json = {k: v for k, v in element_texts_json.items() if v}
 
-            element_texts_formatted = ", ".join(
-                [f"{k}: {v}" for k, v in element_texts_json.items()]
-            )
+            element_texts_formatted = ", ".join([f"{k}: {v}" for k, v in element_texts_json.items()])
 
             response_text = (
                 "Here is the screenshot of the current web page with highlighted clickable elements. \n\n"
@@ -108,9 +102,7 @@ class BrowsingAgent(Agent):
             for i, element_text in enumerate(all_element_texts):
                 element_texts_json[str(i + 1)] = self.remove_unicode(element_text)
 
-            element_texts_formatted = ", ".join(
-                [f"{k}: {v}" for k, v in element_texts_json.items()]
-            )
+            element_texts_formatted = ", ".join([f"{k}: {v}" for k, v in element_texts_json.items()])
 
             response_text = (
                 "Here is the screenshot of the current web page with highlighted text fields: \n"
@@ -141,9 +133,7 @@ class BrowsingAgent(Agent):
                 all_selector_values[str(i + 1)] = selector_values
 
             all_selector_values = {k: v for k, v in all_selector_values.items() if v}
-            all_selector_values_formatted = ", ".join(
-                [f"{k}: {v}" for k, v in all_selector_values.items()]
-            )
+            all_selector_values_formatted = ", ".join([f"{k}: {v}" for k, v in all_selector_values.items()])
 
             response_text = (
                 "Here is the screenshot with highlighted dropdowns. \n"
