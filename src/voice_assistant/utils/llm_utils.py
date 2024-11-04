@@ -1,11 +1,14 @@
 import asyncio
 import os
+from typing import Type, TypeVar
 
 import aiohttp
 import openai
 from pydantic import BaseModel
 
 from voice_assistant.models import ModelName
+
+T = TypeVar('T', bound=BaseModel)
 
 API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_CLIENT = openai.OpenAI(api_key=API_KEY)
@@ -40,7 +43,7 @@ async def get_model_completion(prompt: str, model: ModelName) -> str:
             return result["choices"][0]["message"]["content"]
 
 
-async def get_structured_output_completion(prompt: str, response_format: BaseModel) -> BaseModel:
+async def get_structured_output_completion(prompt: str, response_format: Type[T]) -> T:
     completion = await asyncio.to_thread(
         OPENAI_CLIENT.beta.chat.completions.parse,
         model=ModelName.BASE_MODEL.value,
