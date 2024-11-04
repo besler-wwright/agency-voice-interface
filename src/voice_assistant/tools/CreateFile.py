@@ -2,9 +2,13 @@ import os
 
 from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
-from pydantic import Field
+from pydantic import Field, BaseModel
 
 from voice_assistant.config import SCRATCH_PAD_DIR
+
+class CreateFileResponse(BaseModel):
+    file_name: str
+    file_content: str
 from voice_assistant.models import CreateFileResponse
 from voice_assistant.utils.decorators import timeit_decorator
 from voice_assistant.utils.llm_utils import get_structured_output_completion
