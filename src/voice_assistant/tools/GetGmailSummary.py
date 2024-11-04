@@ -3,7 +3,7 @@ import base64
 import logging
 import re
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
@@ -25,7 +25,7 @@ class GetGmailSummary(BaseTool):
         default=10,
         description="Maximum number of unread emails to fetch. Defaults to 10.",
     )
-    _service: Optional[GoogleServicesUtils] = PrivateAttr(None)
+    _service: Any = PrivateAttr(None)
 
     async def run(self) -> str:
         """
