@@ -2,6 +2,7 @@ import asyncio
 import logging
 from typing import Any, Optional
 
+from openai.types.beta.threads.thread_message import TextContentBlock, ImageFileContentBlock
 from agency_swarm import Agency, get_openai_client
 from agency_swarm.agents import Agent
 from agency_swarm.threads import Thread
@@ -95,7 +96,7 @@ class GetResponse(BaseTool):
 
         if messages.data and messages.data[0].content:
             content_block = messages.data[0].content[0]
-            if hasattr(content_block, 'text') and content_block.text and content_block.text.value:
+            if isinstance(content_block, TextContentBlock) and content_block.text and content_block.text.value:
                 response_text = content_block.text.value
                 return f"{self.agent_name}'s Response: '{response_text}'"
             else:
