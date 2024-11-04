@@ -66,8 +66,8 @@ class SolveCaptcha(BaseTool):
         while attempts < 5:
             tiles = wd.find_elements(By.CLASS_NAME, "rc-imageselect-tile")
 
-            # filter out tiles with rc-imageselect-dynamic-selected class
-            tiles = [tile for tile in tiles if not tile.get_attribute("class").endswith("rc-imageselect-dynamic-selected")]
+            # filter out tiles that have been selected
+            tiles = [tile for tile in tiles if "selected" not in tile.get_attribute("class").lower()]
 
             image_content = []
             i = 0
