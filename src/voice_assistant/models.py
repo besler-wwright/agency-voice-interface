@@ -32,3 +32,16 @@ class FileUpdateResponse(BaseModel):
 class FileDeleteResponse(BaseModel):
     file: str
     force_delete: bool
+from enum import Enum
+from pydantic import BaseModel
+
+
+class ModelName(Enum):
+    """Enum for OpenAI model names"""
+    BASE_MODEL = "gpt-4-1106-preview"
+
+
+class CreateFileResponse(BaseModel):
+    """Response model for file creation"""
+    file_name: str
+    file_content: str
