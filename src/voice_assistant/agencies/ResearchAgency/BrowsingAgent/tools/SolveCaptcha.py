@@ -23,15 +23,9 @@ class SolveCaptcha(BaseTool):
         wd = get_web_driver()
 
         try:
-            WebDriverWait(wd, 10).until(
-                frame_to_be_available_and_switch_to_it(
-                    (By.XPATH, "//iframe[@title='reCAPTCHA']")
-                )
-            )
+            WebDriverWait(wd, 10).until(frame_to_be_available_and_switch_to_it((By.XPATH, "//iframe[@title='reCAPTCHA']")))
 
-            element = WebDriverWait(wd, 3).until(
-                presence_of_element_located((By.ID, "recaptcha-anchor"))
-            )
+            element = WebDriverWait(wd, 3).until(presence_of_element_located((By.ID, "recaptcha-anchor")))
         except Exception as e:
             return "Could not find captcha checkbox"
 
@@ -47,12 +41,7 @@ class SolveCaptcha(BaseTool):
 
         try:
             # Now check if the reCAPTCHA is checked
-            WebDriverWait(wd, 3).until(
-                lambda d: d.find_element(
-                    By.CLASS_NAME, "recaptcha-checkbox"
-                ).get_attribute("aria-checked")
-                == "true"
-            )
+            WebDriverWait(wd, 3).until(lambda d: d.find_element(By.CLASS_NAME, "recaptcha-checkbox").get_attribute("aria-checked") == "true")
 
             return "Success"
         except Exception as e:
@@ -78,13 +67,7 @@ class SolveCaptcha(BaseTool):
             tiles = wd.find_elements(By.CLASS_NAME, "rc-imageselect-tile")
 
             # filter out tiles with rc-imageselect-dynamic-selected class
-            tiles = [
-                tile
-                for tile in tiles
-                if not tile.get_attribute("class").endswith(
-                    "rc-imageselect-dynamic-selected"
-                )
-            ]
+            tiles = [tile for tile in tiles if not tile.get_attribute("class").endswith("rc-imageselect-dynamic-selected")]
 
             image_content = []
             i = 0
@@ -112,11 +95,7 @@ class SolveCaptcha(BaseTool):
 
             # screenshot = get_b64_screenshot(wd, wd.find_element(By.ID, "rc-imageselect"))
 
-            task_text = (
-                wd.find_element(By.CLASS_NAME, "rc-imageselect-instructions")
-                .text.strip()
-                .replace("\n", " ")
-            )
+            task_text = wd.find_element(By.CLASS_NAME, "rc-imageselect-instructions").text.strip().replace("\n", " ")
 
             continuous_task = "once there are none left" in task_text.lower()
 
@@ -129,10 +108,7 @@ class SolveCaptcha(BaseTool):
 
             additional_info = ""
             if len(tiles) > 9:
-                additional_info = (
-                    "Keep in mind that all images are a part of a bigger image "
-                    "from left to right, and top to bottom. The grid is 4x4. "
-                )
+                additional_info = "Keep in mind that all images are a part of a bigger image " "from left to right, and top to bottom. The grid is 4x4. "
 
             messages = [
                 {
@@ -141,7 +117,9 @@ class SolveCaptcha(BaseTool):
                     User will provide you with {i} images numbered from 1 to {i}. Your task is to output
                     the numbers of the images that contain the requested object, or at least some part of the requested
                     object. {additional_info}If there are no individual images that satisfy this condition, output 0.
-                    """.replace("\n", ""),
+                    """.replace(
+                        "\n", ""
+                    ),
                 },
                 {
                     "role": "user",
@@ -149,8 +127,7 @@ class SolveCaptcha(BaseTool):
                         *image_content,
                         {
                             "type": "text",
-                            "text": f"{task_text}. Only output numbers separated by commas and nothing else. "
-                            f"Output 0 if there are none.",
+                            "text": f"{task_text}. Only output numbers separated by commas and nothing else. " f"Output 0 if there are none.",
                         },
                     ],
                 },
@@ -167,7 +144,7 @@ class SolveCaptcha(BaseTool):
             message_text = message.content
 
             # check if 0 is in the message
-            if "0" in message_text and "10" not in message_text:
+            if message_text is not None and "0" in message_text and "10" not in message_text:
                 # Find the button by its ID
                 verify_button = wd.find_element(By.ID, "recaptcha-verify-button")
 
@@ -186,11 +163,7 @@ class SolveCaptcha(BaseTool):
                     pass
 
             else:
-                numbers = [
-                    int(s.strip())
-                    for s in message_text.split(",")
-                    if s.strip().isdigit()
-                ]
+                numbers = [int(s.strip()) for s in message_text.split(",") if s.strip().isdigit()]
 
                 # Click the tiles based on the provided numbers
                 for number in numbers:
@@ -225,13 +198,9 @@ class SolveCaptcha(BaseTool):
 
         # close captcha
         try:
-            element = WebDriverWait(wd, 3).until(
-                presence_of_element_located((By.XPATH, "//iframe[@title='reCAPTCHA']"))
-            )
+            element = WebDriverWait(wd, 3).until(presence_of_element_located((By.XPATH, "//iframe[@title='reCAPTCHA']")))
 
-            wd.execute_script(
-                f"document.elementFromPoint({element.location['x']}, {element.location['y']-10}).click();"
-            )
+            wd.execute_script(f"document.elementFromPoint({element.location['x']}, {element.location['y']-10}).click();")
         except Exception as e:
             print(e)
             pass
@@ -242,18 +211,9 @@ class SolveCaptcha(BaseTool):
         wd.switch_to.default_content()
 
         try:
-            WebDriverWait(wd, 10).until(
-                frame_to_be_available_and_switch_to_it(
-                    (By.XPATH, "//iframe[@title='reCAPTCHA']")
-                )
-            )
+            WebDriverWait(wd, 10).until(frame_to_be_available_and_switch_to_it((By.XPATH, "//iframe[@title='reCAPTCHA']")))
 
-            WebDriverWait(wd, 5).until(
-                lambda d: d.find_element(
-                    By.CLASS_NAME, "recaptcha-checkbox"
-                ).get_attribute("aria-checked")
-                == "true"
-            )
+            WebDriverWait(wd, 5).until(lambda d: d.find_element(By.CLASS_NAME, "recaptcha-checkbox").get_attribute("aria-checked") == "true")
 
             return True
         except Exception as e:

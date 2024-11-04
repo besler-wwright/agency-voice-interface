@@ -49,5 +49,5 @@ class ReadURL(BaseTool):
 
 
 if __name__ == "__main__":
-    tool = ReadURL(url="https://google.com")
+    tool = ReadURL(url="https://google.com", chain_of_thought="Think step-by-step about where you need to navigate next to find the necessary information.")
     print(tool.run())
