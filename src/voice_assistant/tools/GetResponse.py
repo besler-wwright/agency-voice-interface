@@ -2,12 +2,13 @@ import asyncio
 import logging
 from typing import Any, Optional
 
-from openai.types.beta.thread_messages import TextContentBlock, ImageFileContentBlock
 from agency_swarm import Agency, get_openai_client
 from agency_swarm.agents import Agent
 from agency_swarm.threads import Thread
 from agency_swarm.tools import BaseTool
 from openai import OpenAI
+
+# from openai.types.beta.thread_messages import TextContentBlock
 from pydantic import Field, PrivateAttr, field_validator
 
 from voice_assistant.agencies import AGENCIES, AGENCIES_AND_AGENTS_STRING
@@ -96,8 +97,8 @@ class GetResponse(BaseTool):
 
         if messages.data and messages.data[0].content:
             content_block = messages.data[0].content[0]
-            if isinstance(content_block, TextContentBlock) and content_block.text and content_block.text.value:
-                response_text = content_block.text.value
+            if content_block:
+                response_text = content_block.text.value  # type: ignore
                 return f"{self.agent_name}'s Response: '{response_text}'"
             else:
                 return "System Notification: 'Message content is not in text format'"
