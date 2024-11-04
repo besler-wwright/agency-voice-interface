@@ -29,7 +29,7 @@ def prepare_tool_schemas():
     tool_schemas = []
     for tool in TOOLS:
         tool_schema = {k: v for k, v in tool.openai_schema.items() if k != "strict"}
-        tool_type = "function" if not hasattr(tool, "type") else tool.type
+        tool_type = getattr(tool, "type", "function")
         tool_schemas.append({**tool_schema, "type": tool_type})
 
     logger.debug("Tool Schemas:\n%s", tool_schemas)
