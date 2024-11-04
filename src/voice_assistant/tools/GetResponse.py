@@ -3,6 +3,7 @@ import logging
 from typing import Any, Optional
 
 from agency_swarm import Agency, get_openai_client
+from typing import cast
 from agency_swarm.threads import Thread
 from agency_swarm.tools import BaseTool
 from openai import OpenAI
@@ -70,6 +71,7 @@ class GetResponse(BaseTool):
         agency = AGENCIES.get(self.agency_name)
         if not agency:
             return f"Error: Agency '{self.agency_name}' not found"
+        assert isinstance(agency, Agency)  # Type narrowing for static analysis
 
         # Determine the thread based on agent_name
         if not self.agent_name or self.agent_name == agency.ceo.name:
