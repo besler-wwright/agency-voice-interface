@@ -1,4 +1,3 @@
-import base64
 import time
 
 from agency_swarm.tools import BaseTool
@@ -27,7 +26,7 @@ class SolveCaptcha(BaseTool):
 
             element = WebDriverWait(wd, 3).until(presence_of_element_located((By.ID, "recaptcha-anchor")))
         except Exception as e:
-            return "Could not find captcha checkbox"
+            return f"{e}: Could not find captcha checkbox"
 
         try:
             # Scroll the element into view
@@ -44,7 +43,7 @@ class SolveCaptcha(BaseTool):
             WebDriverWait(wd, 3).until(lambda d: d.find_element(By.CLASS_NAME, "recaptcha-checkbox").get_attribute("aria-checked") == "true")
 
             return "Success"
-        except Exception as e:
+        except Exception:
             pass
 
         wd.switch_to.default_content()
@@ -159,7 +158,7 @@ class SolveCaptcha(BaseTool):
                     if self.verify_checkbox(wd):
                         return "Success. Captcha solved."
                 except Exception as e:
-                    print("Not checked")
+                    print(f"{e}: Not checked")
                     pass
 
             else:
@@ -184,7 +183,7 @@ class SolveCaptcha(BaseTool):
                     try:
                         if self.verify_checkbox(wd):
                             return "Success. Captcha solved."
-                    except Exception as e:
+                    except Exception:
                         pass
                 else:
                     continue
@@ -216,7 +215,7 @@ class SolveCaptcha(BaseTool):
             WebDriverWait(wd, 5).until(lambda d: d.find_element(By.CLASS_NAME, "recaptcha-checkbox").get_attribute("aria-checked") == "true")
 
             return True
-        except Exception as e:
+        except Exception:
             wd.switch_to.default_content()
 
             WebDriverWait(wd, 10).until(
