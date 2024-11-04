@@ -96,6 +96,7 @@ if __name__ == "__main__":
             subject="Important Meeting",
             content="Hello,\n\nThis is a draft email for our upcoming meeting.\n\nBest regards,\nYour Name",
             recipient="recipient@example.com",
+            reply_to_id=None  # Add this line
         )
         result = await tool.run()
         print("New email draft:", result)
@@ -104,6 +105,8 @@ if __name__ == "__main__":
         reply_tool = DraftGmail(
             content="Thank you for your email. I'll review the draft and get back to you soon.",
             reply_to_id="1929188e90b212c3",  # Replace with an actual email ID
+            subject=None,  # Add this line 
+            recipient=None  # Add this line
         )
         reply_result = await reply_tool.run()
         print("Reply draft:", reply_result)
