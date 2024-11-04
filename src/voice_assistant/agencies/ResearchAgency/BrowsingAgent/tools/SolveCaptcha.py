@@ -163,7 +163,7 @@ class SolveCaptcha(BaseTool):
                     pass
 
             else:
-                numbers = [int(s.strip()) for s in message_text.split(",") if s.strip().isdigit()]
+                numbers = [int(s.strip()) for s in (message_text or "").split(",") if s.strip().isdigit()]
 
                 # Click the tiles based on the provided numbers
                 for number in numbers:
