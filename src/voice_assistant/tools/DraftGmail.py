@@ -4,7 +4,6 @@ import os
 from datetime import datetime
 from email.mime.text import MIMEText
 from typing import Any, Dict, Optional
-from googleapiclient.discovery import Resource
 
 from agency_swarm.tools import BaseTool
 from pydantic import Field, PrivateAttr
@@ -22,7 +21,7 @@ class DraftGmail(BaseTool):
         description="Recipient of the email. If not provided, the email will be sent to the recipient in the reply_to_id",
     )
     reply_to_id: Optional[str] = Field(None, description="ID of the email to reply to")
-    _service: Resource = PrivateAttr(None)  # Gmail API service object
+    _service: Any = PrivateAttr(None)  # Gmail API service object
 
     async def run(self) -> Dict[str, Any]:
         self._service = await GoogleServicesUtils.authenticate_service("gmail")
