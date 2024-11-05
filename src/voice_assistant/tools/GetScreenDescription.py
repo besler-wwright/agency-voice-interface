@@ -96,18 +96,18 @@ class GetScreenDescription(BaseTool):
         stdout, stderr = await process.communicate()
 
         if process.returncode != 0:
-            return None
+            return None, None
 
         output = stdout.decode().strip()
         if not output:
-            return None
+            return None, None
 
         try:
             bounds = eval(output)
             return bounds if isinstance(bounds, tuple) and len(bounds) == 4 else None
         except Exception as e:
             print(f"Error parsing bounds: {e}")
-            return None
+            return None, None
 
     @timeit_decorator
     async def analyze_image(self, base64_image: str) -> str:
@@ -133,9 +133,7 @@ class GetScreenDescription(BaseTool):
                         },
                         {
                             "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/png;base64,{base64_image}"
-                            },
+                            "image_url": {"url": f"data:image/png;base64,{base64_image}"},
                         },
                     ],
                 },
@@ -172,9 +170,7 @@ class GetScreenDescription(BaseTool):
 if __name__ == "__main__":
 
     async def test_tool():
-        tool = GetScreenDescription(
-            prompt="What do you see in this screenshot? Describe the main elements."
-        )
+        tool = GetScreenDescription(prompt="What do you see in this screenshot? Describe the main elements.")
         try:
             result = await tool.run()
             print(result)
