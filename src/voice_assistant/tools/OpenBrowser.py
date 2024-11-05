@@ -5,7 +5,7 @@ import os
 import sys
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor
-from enum import Enum
+from math import e
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
@@ -17,8 +17,13 @@ from voice_assistant.utils.decorators import timeit_decorator
 
 logger = logging.getLogger(__name__)
 
-with open(os.getenv("PERSONALIZATION_FILE")) as f:
-    personalization = json.load(f)
+
+pf_file_location = os.getenv("PERSONALIZATION_FILE")
+if pf_file_location:
+    with open(pf_file_location) as f:
+        personalization = json.load(f)
+else:
+    raise Exception("PERSONALIZATION_FILE environment variable not set")
 browser = personalization["browser"]
 
 

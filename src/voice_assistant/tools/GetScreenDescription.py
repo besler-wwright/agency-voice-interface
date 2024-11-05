@@ -8,6 +8,7 @@ import aiohttp
 from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
 from PIL import Image
+from PIL.Image import Resampling
 from pydantic import Field
 
 from voice_assistant.models import ModelName
@@ -104,7 +105,7 @@ class GetScreenDescription(BaseTool):
 
         try:
             bounds = eval(output)
-            return bounds if isinstance(bounds, tuple) and len(bounds) == 4 else None
+            return bounds if isinstance(bounds, tuple) and len(bounds) == 4 else None, None
         except Exception as e:
             print(f"Error parsing bounds: {e}")
             return None, None
@@ -161,7 +162,7 @@ class GetScreenDescription(BaseTool):
     def _resize_image(self, image_data: bytes) -> bytes:
         """Resize the image to reduce payload size while preserving aspect ratio."""
         with Image.open(io.BytesIO(image_data)) as img:
-            img.thumbnail((1600, 1200), Image.ANTIALIAS)
+            img.thumbnail((1600, 1200), Resampling.BICUBIC)
             with io.BytesIO() as output:
                 img.save(output, format="PNG")
                 return output.getvalue()
