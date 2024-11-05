@@ -5,14 +5,12 @@ import os
 import sys
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor
-from math import e
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
 from agency_swarm.tools import BaseTool
 from pydantic import Field
 
-from voice_assistant.models import WebUrl
 from voice_assistant.utils.decorators import timeit_decorator
 
 logger = logging.getLogger(__name__)

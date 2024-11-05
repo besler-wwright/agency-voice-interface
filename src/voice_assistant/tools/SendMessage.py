@@ -30,9 +30,7 @@ class SendMessage(BaseTool):
     """
 
     message: str = Field(..., description="The message to be sent.")
-    agency_name: str = Field(
-        ..., description="The name of the agency to send the message to."
-    )
+    agency_name: str = Field(..., description="The name of the agency to send the message to.")
     agent_name: str | None = Field(
         None,
         description="The name of the agent to send the message to, or None to use the default agent.",
@@ -60,20 +58,24 @@ class SendMessage(BaseTool):
             else:
                 recipient_agent = None
 
+            if not recipient_agent:
+                raise NotImplementedError("This shouldn't happen")
+
             response = await asyncio.to_thread(
                 agency.get_completion,
                 message=self.message,
                 recipient_agent=recipient_agent,
             )
-            return response
+            if response:
+                return response
+            else:
+                return "No response received"
         else:
             return f"Agency '{self.agency_name}' not found"
 
 
 # Dynamically update the class docstring with the list of agencies and their agents
-SendMessage.__doc__ = SendMessage.__doc__.format(
-    agency_agents=AGENCIES_AND_AGENTS_STRING
-)
+SendMessage.__doc__ = SendMessage.__doc__.format(agency_agents=AGENCIES_AND_AGENTS_STRING)
 
 
 if __name__ == "__main__":
