@@ -60,7 +60,7 @@ class SendMessageAsync(BaseTool):
             if not recipient_agent:
                 return f"Agent '{self.agent_name}' not found in agency '{self.agency_name}'. Available agents: {', '.join(agent.name for agent in agency.agents)}"
 
-            thread: Thread = agency.agents_and_threads.get(agency.ceo.name, {}).get(self.agent_name)
+            thread: Thread = agency.agents_and_threads.get(agency.ceo.name, {}).get(self.agent_name)  # type: ignore
 
         if isinstance(thread, ThreadAsync):
             return await asyncio.to_thread(
@@ -74,11 +74,12 @@ class SendMessageAsync(BaseTool):
                 message=self.message,
                 recipient_agent=recipient_agent,
             )
-        return f"Message sent asynchronously. Use 'GetResponse' to check status."
+        return "Message sent asynchronously. Use 'GetResponse' to check status."
 
 
 # Dynamically update the class docstring with the list of agencies and their agents
-SendMessageAsync.__doc__ = SendMessageAsync.__doc__.format(agency_agents=AGENCIES_AND_AGENTS_STRING)
+if SendMessageAsync.__doc__:
+    SendMessageAsync.__doc__ = SendMessageAsync.__doc__.format(agency_agents=AGENCIES_AND_AGENTS_STRING)
 
 
 if __name__ == "__main__":

@@ -18,10 +18,7 @@ from voice_assistant.microphone import AsyncMicrophone
 from voice_assistant.tools import TOOL_SCHEMAS
 from voice_assistant.utils import base64_encode_audio
 from voice_assistant.utils.log_utils import log_ws_event
-from voice_assistant.visual_interface import (
-    VisualInterface,
-    run_visual_interface,
-)
+from voice_assistant.visual_interface import VisualInterface, run_visual_interface
 from voice_assistant.websocket_handler import process_ws_messages
 
 # Set up logging
@@ -60,7 +57,7 @@ async def realtime_api():
                     "session": {
                         "modalities": ["text", "audio"],
                         "instructions": SESSION_INSTRUCTIONS,
-                        "voice": "shimmer",
+                        "voice": "alloy",
                         "input_audio_format": "pcm16",
                         "output_audio_format": "pcm16",
                         "turn_detection": {
@@ -75,16 +72,10 @@ async def realtime_api():
                 log_ws_event("outgoing", session_update)
                 await websocket.send(json.dumps(session_update))
 
-                ws_task = asyncio.create_task(
-                    process_ws_messages(websocket, mic, visual_interface)
-                )
-                visual_task = asyncio.create_task(
-                    run_visual_interface(visual_interface)
-                )
+                ws_task = asyncio.create_task(process_ws_messages(websocket, mic, visual_interface))
+                visual_task = asyncio.create_task(run_visual_interface(visual_interface))
 
-                logger.info(
-                    "Conversation started. Speak freely, and the assistant will respond."
-                )
+                logger.info("Conversation started. Speak freely, and the assistant will respond.")
                 mic.start_recording()
                 logger.info("Recording started. Listening for speech...")
 
@@ -109,9 +100,7 @@ async def realtime_api():
                 except KeyboardInterrupt:
                     logger.info("Keyboard interrupt received. Closing the connection.")
                 except Exception as e:
-                    logger.exception(
-                        f"An unexpected error occurred in the main loop: {e}"
-                    )
+                    logger.exception(f"An unexpected error occurred in the main loop: {e}")
                 finally:
                     exit_event.set()
                     mic.stop_recording()
@@ -130,9 +119,7 @@ async def realtime_api():
             break
         except ConnectionClosedError as e:
             if "keepalive ping timeout" in str(e):
-                logging.warning(
-                    "WebSocket connection lost due to keepalive ping timeout. Reconnecting..."
-                )
+                logging.warning("WebSocket connection lost due to keepalive ping timeout. Reconnecting...")
                 await asyncio.sleep(1)  # Wait before reconnecting
                 continue  # Retry the connection
             logging.exception("WebSocket connection closed unexpectedly.")
