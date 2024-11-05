@@ -41,8 +41,11 @@ class SendMessage(BaseTool):
 
     @timeit_decorator
     async def run(self) -> str:
-        result = await self._send_message()
-        return str(result)
+        try:
+            result = await self._send_message()
+            return str(result)
+        except Exception as e:
+            return f"Error: {str(e)}"
 
     async def _send_message(self) -> str:
         agency = AGENCIES.get(self.agency_name)
@@ -59,7 +62,7 @@ class SendMessage(BaseTool):
                 recipient_agent = None
 
             if not recipient_agent:
-                raise NotImplementedError("This shouldn't happen")
+                return f"No agent specified for agency '{self.agency_name}'"
 
             response = await asyncio.to_thread(
                 agency.get_completion,
