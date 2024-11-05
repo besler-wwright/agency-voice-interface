@@ -47,7 +47,7 @@ class SendMessage(BaseTool):
         except Exception as e:
             return f"Error: {str(e)}"
 
-    async def _send_message(self) -> str:
+    async def _send_message(self):
         agency = AGENCIES.get(self.agency_name)
         if agency:
             recipient_agent = None
