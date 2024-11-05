@@ -78,7 +78,8 @@ class SendMessage(BaseTool):
 
 
 # Dynamically update the class docstring with the list of agencies and their agents
-SendMessage.__doc__ = SendMessage.__doc__.format(agency_agents=AGENCIES_AND_AGENTS_STRING)
+if SendMessage.__doc__:
+    SendMessage.__doc__ = SendMessage.__doc__.format(agency_agents=AGENCIES_AND_AGENTS_STRING)
 
 
 if __name__ == "__main__":
