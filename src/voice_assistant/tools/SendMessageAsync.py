@@ -8,6 +8,7 @@ import asyncio
 import logging
 
 from agency_swarm.agency import Agency
+from agency_swarm.agents import Agent
 from agency_swarm.threads import Thread
 from agency_swarm.threads.thread_async import ThreadAsync
 from agency_swarm.tools import BaseTool
@@ -32,9 +33,7 @@ class SendMessageAsync(BaseTool):
     """
 
     message: str = Field(..., description="The message to be sent.")
-    agency_name: str = Field(
-        ..., description="The name of the agency to send the message to."
-    )
+    agency_name: str = Field(..., description="The name of the agency to send the message to.")
     agent_name: str | None = Field(
         None,
         description="The name of the agent to send the message to, or None to use the default agent.",
@@ -50,8 +49,9 @@ class SendMessageAsync(BaseTool):
         if not agency:
             return f"Agency '{self.agency_name}' not found"
 
-        if not self.agent_name or self.agent_name == agency.ceo.name:
-            thread: Thread = agency.main_thread
+        if not self.agent_name or (isinstance(agency.ceo, Agent) and self.agent_name == agency.ceo.name):
+            if agency.main_thread:
+                thread: Thread = agency.main_thread
         else:
             recipient_agent = next(
                 (agent for agent in agency.agents if agent.name == self.agent_name),
@@ -60,9 +60,7 @@ class SendMessageAsync(BaseTool):
             if not recipient_agent:
                 return f"Agent '{self.agent_name}' not found in agency '{self.agency_name}'. Available agents: {', '.join(agent.name for agent in agency.agents)}"
 
-            thread: Thread = agency.agents_and_threads.get(agency.ceo.name, {}).get(
-                self.agent_name
-            )
+            thread: Thread = agency.agents_and_threads.get(agency.ceo.name, {}).get(self.agent_name)
 
         if isinstance(thread, ThreadAsync):
             return await asyncio.to_thread(
@@ -80,9 +78,7 @@ class SendMessageAsync(BaseTool):
 
 
 # Dynamically update the class docstring with the list of agencies and their agents
-SendMessageAsync.__doc__ = SendMessageAsync.__doc__.format(
-    agency_agents=AGENCIES_AND_AGENTS_STRING
-)
+SendMessageAsync.__doc__ = SendMessageAsync.__doc__.format(agency_agents=AGENCIES_AND_AGENTS_STRING)
 
 
 if __name__ == "__main__":
