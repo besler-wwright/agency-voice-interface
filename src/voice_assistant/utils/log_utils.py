@@ -63,12 +63,10 @@ def log_ws_event(direction: str, event: dict):
     icon = "⬆️ - Out" if direction.lower() == "outgoing" else "⬇️ - In"
     message = f"{emoji} {icon} {event_type}"
 
-    # If it's the same event type, update the current line
+    # If it's the same event type, update the current line, this gives the appearance of just the time updating
     if event_type == _last_event_type:
+        sys.stdout.write('\033[F')  # Move cursor up one line
         sys.stdout.write('\r')
         sys.stdout.flush()
-    else:
-        # If it's a different event type, log a new line
-        logger.info(message)
-        # print()  # Add newline before next different message
-        _last_event_type = event_type
+    logger.info(message)
+    _last_event_type = event_type
