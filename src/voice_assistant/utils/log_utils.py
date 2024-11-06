@@ -65,9 +65,12 @@ def log_ws_event(direction: str, event: dict):
 
     # If it's the same event type, update the current line
     if event_type == _last_event_type:
-        sys.stdout.write('\r' + message)
+        sys.stdout.write('\r' + f"INFO:voice_assistant.utils.log_utils:{message}")
+        sys.stdout.write(' ' * 50)  # Clear any remaining characters from previous line
+        sys.stdout.write('\r' + f"INFO:voice_assistant.utils.log_utils:{message}")  # Return to start and write message
         sys.stdout.flush()
     else:
         # If it's a different event type, log a new line
         logger.info(message)
+        print()  # Add newline before next different message
         _last_event_type = event_type
