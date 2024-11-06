@@ -1,11 +1,14 @@
 import json
 import logging
+import sys
 from datetime import datetime
 
 from voice_assistant.config import RUN_TIME_TABLE_LOG_JSON
 
 logger = logging.getLogger(__name__)
 
+# Track the last event type
+_last_event_type = None
 
 def log_runtime(function_or_name: str, duration: float):
     time_record = {
@@ -21,6 +24,7 @@ def log_runtime(function_or_name: str, duration: float):
 
 
 def log_ws_event(direction: str, event: dict):
+    global _last_event_type
     event_type = event.get("type", "Unknown")
     event_emojis = {
         "session.update": "🛠️",
@@ -57,4 +61,13 @@ def log_ws_event(direction: str, event: dict):
     }
     emoji = event_emojis.get(event_type, "❓")
     icon = "⬆️ - Out" if direction.lower() == "outgoing" else "⬇️ - In"
-    logger.info(f"{emoji} {icon} {event_type}")
+    message = f"{emoji} {icon} {event_type}"
+
+    # If it's the same event type, update the current line
+    if event_type == _last_event_type:
+        sys.stdout.write('\r' + message)
+        sys.stdout.flush()
+    else:
+        # If it's a different event type, log a new line
+        logger.info(message)
+        _last_event_type = event_type
