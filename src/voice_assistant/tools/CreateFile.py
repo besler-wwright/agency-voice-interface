@@ -3,6 +3,7 @@ import os
 from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
 from pydantic import Field
+from rich.console import Console
 
 from voice_assistant.config import SCRATCH_PAD_DIR
 from voice_assistant.models import CreateFileResponse
@@ -28,6 +29,7 @@ async def create_file(file_name: str, prompt: str) -> dict:
     file_path = os.path.join(SCRATCH_PAD_DIR, file_name)
 
     if os.path.exists(file_path):
+        Console().print(f"[bold red]File already exists: [/bold red]{file_path}")
         return {"status": "File already exists"}
 
     prompt_structure = f"""
@@ -44,8 +46,11 @@ async def create_file(file_name: str, prompt: str) -> dict:
 
     response = await get_structured_output_completion(prompt_structure, CreateFileResponse)
 
+    
     with open(file_path, "w") as f:
+        Console().print(f"[bold green]File Created: [/bold green]{file_path}")
         f.write(response.file_content)
+        
 
     return {"status": "File created", "file_name": response.file_name}
 

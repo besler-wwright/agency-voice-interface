@@ -7,7 +7,7 @@ from pydantic import BaseModel
 class ModelName(Enum):
     """Enum for OpenAI model names"""
 
-    BASE_MODEL = "gpt-4-1106-preview"
+    BASE_MODEL = "gpt-4o" # "gpt-4-1106-preview"
     FAST_MODEL = "gpt-4o-mini"
 
 
