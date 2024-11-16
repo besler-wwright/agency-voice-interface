@@ -63,8 +63,7 @@ async def process_ws_messages(websocket, mic, visual_interface):
                             f"🛠️ Calling function: {function_name} with args: {args}"
                         )
                         try:
-                            tool_instance = tool.__new__(tool)
-                            tool_instance.__init__(**args)
+                            tool_instance = tool(**args)  # type: ignore
                             result = await tool_instance.run() # type: ignore
                             logger.info(
                                 f"🛠️ Function {function_name} call result: {result}"
