@@ -41,7 +41,7 @@ class WebPageSummarizer(BaseTool):
 
 if __name__ == "__main__":
     wd = get_web_driver()
-    wd.get("https://en.wikipedia.org/wiki/Python_(programming_language)")
+    wd.get("https://www.besler.com")
     set_web_driver(wd)
     tool = WebPageSummarizer()
     print(tool.run())
