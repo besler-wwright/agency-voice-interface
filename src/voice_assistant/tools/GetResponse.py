@@ -10,7 +10,7 @@ from openai import OpenAI
 from openai.types.beta.threads import TextContentBlock
 from pydantic import Field, PrivateAttr, field_validator
 
-from voice_assistant.agencies import AGENCIES, AGENCIES_AND_AGENTS_STRING
+from voice_assistant.tools.registry import AgenciesRegistry
 from voice_assistant.utils.decorators import timeit_decorator
 
 logger = logging.getLogger(__name__)
@@ -32,22 +32,30 @@ class GetResponse(BaseTool):
     agency_name: str = Field(..., description="The name of the agency.")
     agent_name: Optional[str] = Field(None, description="The name of the agent, or None to use the default agent.")
     _client: OpenAI = PrivateAttr()
+    _registry: AgenciesRegistry = PrivateAttr()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._client = get_openai_client()
+        self._registry = AgenciesRegistry()
 
     @field_validator("agency_name", mode="before")
     def validate_agency_name(cls, value: str) -> str:
-        if value not in AGENCIES:
-            available = ", ".join(AGENCIES.keys())
+        registry = AgenciesRegistry()
+        if not registry.get_agency(value):
+            available = registry.get_available_agencies()
             raise ValueError(f"Agency '{value}' not found. Available agencies: {available}")
         return value
 
     @field_validator("agent_name", mode="before")
     def validate_agent_name(cls, value: Optional[str]) -> Optional[str]:
         if value:
-            agent_names = [agent.name for agency in AGENCIES.values() for agent in agency.agents]
+            registry = AgenciesRegistry()
+            agent_names = [
+                agent.name 
+                for agency in registry.agencies.values() 
+                for agent in agency.agents
+            ]
             if value not in agent_names:
                 available = ", ".join(agent_names)
                 raise ValueError(f"Agent '{value}' not found. Available agents: {available}")
@@ -61,7 +69,7 @@ class GetResponse(BaseTool):
         Returns:
             str: The result message based on the task status.
         """
-        agency = AGENCIES.get(self.agency_name)
+        agency = self._registry.get_agency(self.agency_name)
         if not agency:
             return f"Error: Agency '{self.agency_name}' not found"
         assert isinstance(agency, Agency)  # Type narrowing for static analysis
@@ -117,7 +125,9 @@ class GetResponse(BaseTool):
 
 # Dynamically update the class docstring with the list of agencies and their agents
 if GetResponse.__doc__:
-    GetResponse.__doc__ = GetResponse.__doc__.format(agency_agents=AGENCIES_AND_AGENTS_STRING)
+    GetResponse.__doc__ = GetResponse.__doc__.format(
+        agency_agents=AgenciesRegistry().agencies_string
+    )
 
 
 if __name__ == "__main__":
