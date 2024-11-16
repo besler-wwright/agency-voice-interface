@@ -19,18 +19,13 @@ class SendMessage(BaseTool):
     """
     Sends a message to a specific agent within a specified agency and waits for an immediate response.
 
-    Parameters:
-        message (str): The message to be sent
-        agency_name (str): The target agency name
-        agent_name (str, optional): Specific agent name, uses default if not provided
+    Use this tool for direct, synchronous communication with agents for tasks that can be completed quickly.
+    The agent processes the message and returns a response immediately.
+    If 'agent_name' is not provided, the message is sent to the main agent in the agency.
 
-    Returns:
-        str: The agent's response or error message
-
-    Usage:
-        For quick, synchronous communication with agents.
-        Messages are processed immediately and return a response.
-        For asynchronous operations, use SendMessageAsync instead.
+    To continue the dialogue, invoke this tool again with your follow-up message.
+    Note: You are responsible for relaying the agent's responses back to the user.
+    Do not send more than one message at a time.
 
     Available Agencies and Agents:
     {agency_agents}
@@ -107,7 +102,13 @@ class SendMessage(BaseTool):
             recipient_agent=recipient_agent or agency.agents[0]  # Use first agent as default
         )
         
-        return response if response else "No response received"
+        if isinstance(response, str):
+             return response
+        elif response is None:
+             return "No response received"
+        else:
+            # Handle generator or other types by converting to string
+            return str(response)
 
     def _format_agent_error(self) -> str:
         agency = self._registry.get_agency(self.agency_name)
