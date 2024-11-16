@@ -112,6 +112,9 @@ class SendMessage(BaseTool):
 
     def _format_agent_error(self) -> str:
         agency = self._registry.get_agency(self.agency_name)
+        if not agency:
+            return f"Agency '{self.agency_name}' not found"
+            
         available = ", ".join(agent.name for agent in agency.agents)
         return f"Agent '{self.agent_name}' not found in agency '{self.agency_name}'. Available agents: {available}"
 
