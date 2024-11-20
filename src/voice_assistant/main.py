@@ -72,7 +72,7 @@ async def realtime_api(tool_schemas):
                 log_ws_event("outgoing", session_update)
                 await websocket.send(json.dumps(session_update))
 
-                ws_task = asyncio.create_task(process_ws_messages(websocket, mic, visual_interface))
+                ws_task = asyncio.create_task(process_ws_messages(websocket, mic, visual_interface, tools))
                 visual_task = asyncio.create_task(run_visual_interface(visual_interface))
 
                 logger.info("Conversation started. Speak freely, and the assistant will respond.")

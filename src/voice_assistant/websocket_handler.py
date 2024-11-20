@@ -6,13 +6,12 @@ import time
 import websockets
 
 from voice_assistant.audio import audio_player
-from voice_assistant.tools import TOOLS
 from voice_assistant.utils.log_utils import log_runtime, log_ws_event
 
 logger = logging.getLogger(__name__)
 
 
-async def process_ws_messages(websocket, mic, visual_interface):
+async def process_ws_messages(websocket, mic, visual_interface, tools):
     assistant_reply = ""
     function_call = None
     function_call_args = ""
@@ -53,7 +52,7 @@ async def process_ws_messages(websocket, mic, visual_interface):
                     tool = next(
                         (
                             t
-                            for t in TOOLS
+                            for t in tools
                             if t.__name__.lower() == function_name.lower()
                         ),
                         None,
@@ -76,7 +75,7 @@ async def process_ws_messages(websocket, mic, visual_interface):
                                 "error": f"Function '{function_name}' failed: {str(e)}"
                             }
                     else:
-                        logger.warning(f"Function '{function_name}' not found in TOOLS")
+                        logger.warning(f"Function '{function_name}' not found in available tools")
                         result = {"error": f"Function '{function_name}' not found."}
 
                     function_call_output = {
