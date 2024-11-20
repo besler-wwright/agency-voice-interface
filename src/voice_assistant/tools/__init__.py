@@ -29,21 +29,18 @@ def load_tools() -> List[Type[BaseTool]]:
     return tools
 
 
-def prepare_tool_schemas() -> List[Dict[str, Any]]:
+def prepare_tool_schemas(tools: List[Type[BaseTool]]) -> List[Dict[str, Any]]:
     """Prepare the schemas for the tools.
+    
+    Args:
+        tools: List of tool classes to prepare schemas for
     
     Returns:
         List[Dict[str, Any]]: A list of tool schemas ready for OpenAI consumption
     """
     tool_schemas = []
-    for tool in TOOLS:
+    for tool in tools:
         tool_schema = {k: v for k, v in tool.openai_schema.items() if k != "strict"}
         tool_type = getattr(tool, "type", "function")
         tool_schemas.append({**tool_schema, "type": tool_type})
-        # c.print("\n\nTool Schema:",tool_schema )   
     return tool_schemas
-
-
-# Load all tools
-TOOLS: List[Type[BaseTool]] = load_tools()
-TOOL_SCHEMAS = prepare_tool_schemas()

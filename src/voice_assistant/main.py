@@ -15,7 +15,7 @@ from voice_assistant.config import (
     SILENCE_THRESHOLD,
 )
 from voice_assistant.microphone import AsyncMicrophone
-from voice_assistant.tools import TOOL_SCHEMAS
+from voice_assistant.tools import load_tools, prepare_tool_schemas
 from voice_assistant.utils import base64_encode_audio
 from voice_assistant.utils.log_utils import log_ws_event
 from voice_assistant.visual_interface import VisualInterface, run_visual_interface
@@ -30,7 +30,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def realtime_api():
+async def realtime_api(tool_schemas):
     while True:
         try:
             api_key = os.getenv("OPENAI_API_KEY")
@@ -66,7 +66,7 @@ async def realtime_api():
                             "prefix_padding_ms": PREFIX_PADDING_MS,
                             "silence_duration_ms": SILENCE_DURATION_MS,
                         },
-                        "tools": TOOL_SCHEMAS,
+                        "tools": tool_schemas,
                     },
                 }
                 log_ws_event("outgoing", session_update)
@@ -137,7 +137,10 @@ async def realtime_api():
 
 
 async def main_async():
-    await realtime_api()
+    # Load tools at startup
+    tools = load_tools()
+    tool_schemas = prepare_tool_schemas(tools)
+    await realtime_api(tool_schemas)
 
 
 def main():
