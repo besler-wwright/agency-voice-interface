@@ -1,4 +1,5 @@
 import importlib
+from typing import List, Type, Dict, Any
 
 # import logging
 import os
@@ -10,7 +11,7 @@ c = Console()
 # logger = logging.getLogger(__name__)
 
 
-def load_tools():
+def load_tools() -> List[Type[BaseTool]]:
     tools = []
     current_dir = os.path.dirname(os.path.abspath(__file__))
     c.print(f"[bold blue]Loading tools from {current_dir}[/bold blue]")
@@ -30,8 +31,12 @@ def load_tools():
     return tools
 
 
-def prepare_tool_schemas():
-    """Prepare the schemas for the tools."""
+def prepare_tool_schemas() -> List[Dict[str, Any]]:
+    """Prepare the schemas for the tools.
+    
+    Returns:
+        List[Dict[str, Any]]: A list of tool schemas ready for OpenAI consumption
+    """
     tool_schemas = []
     for tool in TOOLS:
         tool_schema = {k: v for k, v in tool.openai_schema.items() if k != "strict"}
@@ -42,5 +47,5 @@ def prepare_tool_schemas():
 
 
 # Load all tools
-TOOLS: list[BaseTool] = load_tools()
+TOOLS: List[Type[BaseTool]] = load_tools()
 TOOL_SCHEMAS = prepare_tool_schemas()
