@@ -30,7 +30,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def realtime_api(tool_schemas):
+async def realtime_api(tool_schemas, tools):
     while True:
         try:
             api_key = os.getenv("OPENAI_API_KEY")
@@ -140,7 +140,7 @@ async def main_async():
     # Load tools at startup
     tools = load_tools()
     tool_schemas = prepare_tool_schemas(tools)
-    await realtime_api(tool_schemas)
+    await realtime_api(tool_schemas, tools)
 
 
 def main():
