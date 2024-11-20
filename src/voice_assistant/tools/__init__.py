@@ -1,14 +1,12 @@
 import importlib
-from typing import List, Type, Dict, Any
-
-# import logging
 import os
+from typing import Any, Dict, List, Type
 
 from agency_swarm.tools import BaseTool
 from rich.console import Console
 
 c = Console()
-# logger = logging.getLogger(__name__)
+
 
 
 def load_tools() -> List[Type[BaseTool]]:
