@@ -16,7 +16,7 @@ def load_tools() -> List[Type[BaseTool]]:
     for filename in os.listdir(current_dir):
         if filename.endswith(".py") and filename != "__init__.py":
             module_name = filename[:-3]
-            c.print(f"\t[yellow]Inspecting Module: {module_name}[/yellow]")
+            c.print(f"\t[dim]Inspecting Module: {module_name}[/dim]")
             module = importlib.import_module(f"voice_assistant.tools.{module_name}")
             for name, obj in module.__dict__.items():
                 if (
