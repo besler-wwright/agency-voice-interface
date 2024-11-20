@@ -1,13 +1,14 @@
 import importlib
 import os
 
-from agency_swarm import Agency
 from rich.console import Console
 
+from voice_assistant.tools.registry import AgenciesRegistry
 
-def load_agencies() -> dict[str, Agency]:
+def initialize_registry():
+    """Initialize the registry with all available agencies."""
+    registry = AgenciesRegistry()
     c = Console()
-    agencies = {}
     current_dir = os.path.dirname(os.path.abspath(__file__))
     c.print(f"[bold green]Loading agencies from {current_dir}[/bold green]")
 
@@ -17,19 +18,16 @@ def load_agencies() -> dict[str, Agency]:
             try:
                 c.print(f"\t[dim]Inspecting Module: {agency_folder}[/dim]")
                 agency_module = importlib.import_module(f"voice_assistant.agencies.{agency_folder}.agency")
+                agency = getattr(agency_module, "agency")
+                description = f"Agency with agents: {', '.join(agent.name for agent in agency.agents)}"
+                registry.register(agency_folder, agency, description)
                 c.print("\t[green]Agency loaded successfully.[/green]")
-                agencies[agency_folder] = getattr(agency_module, "agency")
             except (ImportError, AttributeError) as e:
                 c.print(f"Error loading agency {agency_folder}: {e}")
 
-    return agencies
+    # Print available agencies for debugging
+    print("Available Agencies and Agents:\n", registry.agencies_string)
+    return registry
 
-
-# Load all agencies
-AGENCIES: dict[str, Agency] = load_agencies()
-
-AGENCIES_AND_AGENTS_STRING = "\n".join(
-    f"Agency '{agency_name}' has the following agents: {', '.join(agent.name for agent in agency.agents)}"
-    for agency_name, agency in AGENCIES.items()
-)
-print("Available Agencies and Agents:\n", AGENCIES_AND_AGENTS_STRING)  # Debug print
+# Initialize the registry when this module is imported
+registry = initialize_registry()
