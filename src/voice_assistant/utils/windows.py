@@ -16,8 +16,18 @@ def list_visible_windows():
     win32gui.EnumWindows(enum_window_callback, windows)
     return windows
 
-def list_all_windows():
-    """List all windows, including invisible/inactive ones."""
+def list_all_windows(*, visible_only: bool = False, enabled_only: bool = False, non_minimized_only: bool = False, title_contains: str = None):
+    """List windows based on specified filters.
+    
+    Args:
+        visible_only (bool): If True, only include visible windows
+        enabled_only (bool): If True, only include enabled windows
+        non_minimized_only (bool): If True, exclude minimized windows
+        title_contains (str): If provided, only include windows whose titles contain this string (case-insensitive)
+    
+    Returns:
+        list: List of dictionaries containing window information that matches all specified filters
+    """
     windows = []
     
     def enum_window_callback(hwnd, results):
@@ -25,12 +35,25 @@ def list_all_windows():
         if title:  # Only include windows with titles
             visible = win32gui.IsWindowVisible(hwnd)
             style = win32gui.GetWindowLong(hwnd, win32con.GWL_STYLE)
+            enabled = bool(style & win32con.WS_DISABLED == 0)
+            minimized = bool(style & win32con.WS_MINIMIZE)
+            
+            # Apply filters
+            if visible_only and not visible:
+                return
+            if enabled_only and not enabled:
+                return
+            if non_minimized_only and minimized:
+                return
+            if title_contains and title_contains.lower() not in title.lower():
+                return
+                
             results.append({
                 'handle': hwnd,
                 'title': title,
                 'visible': visible,
-                'enabled': bool(style & win32con.WS_DISABLED == 0),
-                'minimized': bool(style & win32con.WS_MINIMIZE)
+                'enabled': enabled,
+                'minimized': minimized
             })
     
     win32gui.EnumWindows(enum_window_callback, windows)
@@ -72,6 +95,17 @@ if __name__ == "__main__":
                 f"Visible: {window['visible']} | "
                 f"Enabled: {window['enabled']} | "
                 f"Minimized: {window['minimized']}")    
+
+    # Example filtering
+    print("\nVisible, non-minimized windows:")
+    filtered_windows = list_all_windows(visible_only=True, non_minimized_only=True)
+    for window in filtered_windows:
+        print(f"Title: {window['title']}")
+        
+    print("\nWindows containing 'chrome':")
+    chrome_windows = list_all_windows(title_contains="chrome")
+    for window in chrome_windows:
+        print(f"Title: {window['title']}")
 
     # Example: Activate a window by title
     search_title = "Notepad"
