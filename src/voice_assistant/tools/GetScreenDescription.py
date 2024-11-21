@@ -6,6 +6,14 @@ import sys
 import tempfile
 from typing import Optional, Tuple
 
+class ScreenCaptureError(Exception):
+    """Raised when screen capture fails"""
+    pass
+
+class WindowBoundsError(Exception):
+    """Raised when unable to get window bounds"""
+    pass
+
 import aiohttp
 from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
@@ -31,51 +39,89 @@ class GetScreenDescription(BaseTool):
 
     @logger.catch  
     async def run(self) -> str:
-        """Execute the screen description tool."""
-
+        """
+        Execute the screen description tool.
+        
+        Returns:
+            str: Analysis of the screenshot
+            
+        Raises:
+            ScreenCaptureError: If screenshot capture fails
+            RuntimeError: If image analysis fails
+        """
+        screenshot_path = None
         try:
             screenshot_path = await self.take_screenshot()
             file_content = await asyncio.to_thread(self._read_file, screenshot_path)
             resized_content = await asyncio.to_thread(self._resize_image, file_content)
             encoded_image = base64.b64encode(resized_content).decode("utf-8")
-            analysis = await self.analyze_image(encoded_image)
+            return await self.analyze_image(encoded_image)
+        
         finally:
-            asyncio.create_task(asyncio.to_thread(os.remove, screenshot_path))
-
-        return analysis
+            if screenshot_path and os.path.exists(screenshot_path):
+                await asyncio.to_thread(os.remove, screenshot_path)
 
     async def take_screenshot(self) -> str:
-        """Capture a screenshot of the active window."""
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp_file:
-            screenshot_path = tmp_file.name
+        """
+        Capture a screenshot of the active window.
+        
+        Returns:
+            str: Path to the temporary screenshot file
+            
+        Raises:
+            WindowBoundsError: If unable to get active window bounds
+            ScreenCaptureError: If screenshot capture fails
+            OSError: If file operations fail
+        """
+        try:
+            # Create temporary file
+            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp_file:
+                screenshot_path = tmp_file.name
 
-        bounds = await self._get_active_window_bounds()
-        if not bounds:
-            raise RuntimeError("Unable to retrieve the active window bounds.")
+            # Get window bounds
+            bounds = await self._get_active_window_bounds()
+            if not bounds:
+                raise WindowBoundsError("Failed to retrieve active window bounds")
 
-        x, y, width, height = bounds
+            x, y, width, height = bounds
+            
+            # Execute screenshot command
+            process = await asyncio.create_subprocess_exec(
+                "screencapture",
+                "-R",
+                f"{x},{y},{width},{height}",
+                screenshot_path,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
 
-        process = await asyncio.create_subprocess_exec(
-            "screencapture",
-            "-R",
-            f"{x},{y},{width},{height}",
-            screenshot_path,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
+            stdout, stderr = await process.communicate()
 
-        stdout, stderr = await process.communicate()
+            if process.returncode != 0:
+                error_msg = stderr.decode().strip()
+                raise ScreenCaptureError(f"Screenshot capture failed: {error_msg}")
 
-        if process.returncode != 0:
-            raise RuntimeError(f"take_screenshot: screencapture failed: {stderr.decode().strip()}")
+            if not os.path.exists(screenshot_path):
+                raise ScreenCaptureError(f"Screenshot file not created at {screenshot_path}")
 
-        if not os.path.exists(screenshot_path):
-            raise FileNotFoundError(f"take_screenshot Screenshot was not created at {screenshot_path}")
+            if os.path.getsize(screenshot_path) == 0:
+                raise ScreenCaptureError("Screenshot file is empty")
 
-        if self.debug_output:
-            print(f"take_screenshot: Screenshot created at {screenshot_path}")
+            logger.debug(f"Screenshot created successfully at {screenshot_path}")
+            return screenshot_path
 
-        return screenshot_path
+        except (WindowBoundsError, ScreenCaptureError) as e:
+            # Clean up file if it exists
+            if 'screenshot_path' in locals() and os.path.exists(screenshot_path):
+                await asyncio.to_thread(os.remove, screenshot_path)
+            raise
+
+        except Exception as e:
+            # Clean up file if it exists
+            if 'screenshot_path' in locals() and os.path.exists(screenshot_path):
+                await asyncio.to_thread(os.remove, screenshot_path)
+            logger.exception("Unexpected error during screenshot capture")
+            raise ScreenCaptureError(f"Screenshot capture failed: {str(e)}") from e
 
     async def _get_active_window_bounds(self) -> Optional[Tuple[int, int, int, int]]:
         """
