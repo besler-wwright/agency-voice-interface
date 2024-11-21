@@ -2,8 +2,10 @@ import asyncio
 import base64
 import io
 import os
+import sys
 import tempfile
 from calendar import c
+from typing import Optional, Tuple
 
 import aiohttp
 from agency_swarm.tools import BaseTool
@@ -78,8 +80,29 @@ class GetScreenDescription(BaseTool):
 
         return screenshot_path
 
-    async def _get_active_window_bounds(self) -> tuple:
-        """Retrieve the bounds of the active window."""
+    async def _get_active_window_bounds(self) -> Optional[Tuple[int, int, int, int]]:
+        """
+        Retrieve the bounds of the active window across different platforms.
+        
+        Returns:
+            Tuple[int, int, int, int]: (x, y, width, height) or None if failed
+        """
+        try:
+            if sys.platform == "darwin":  # macOS
+                return await self._get_macos_window_bounds()
+            elif sys.platform == "win32":  # Windows
+                return await self._get_windows_window_bounds()
+            elif sys.platform.startswith("linux"):  # Linux
+                return await self._get_linux_window_bounds()
+            else:
+                raise NotImplementedError(f"Platform {sys.platform} not supported")
+        except Exception as e:
+            if self.debug_output:
+                print(f"Error getting window bounds: {e}")
+            return None
+
+    async def _get_macos_window_bounds(self) -> Optional[Tuple[int, int, int, int]]:
+        """Get active window bounds for macOS using AppleScript."""
         script = """
         tell application "System Events"
             set frontApp to first application process whose frontmost is true
@@ -105,23 +128,81 @@ class GetScreenDescription(BaseTool):
 
         stdout, stderr = await process.communicate()
         if self.debug_output:
-            c=Console()
+            c = Console()
             c.print(f"[bold green]stdout: {stdout.decode()}[/bold green]")
             c.print(f"[bold red]stderr: {stderr.decode()}[/bold red]")
 
         if process.returncode != 0:
-            return None, None
+            return None
 
         output = stdout.decode().strip()
         if not output:
-            return None, None
+            return None
 
         try:
             bounds = eval(output)
-            return bounds if isinstance(bounds, tuple) and len(bounds) == 4 else None, None
+            return bounds if isinstance(bounds, tuple) and len(bounds) == 4 else None
         except Exception as e:
             print(f"Error parsing bounds: {e}")
-            return None, None
+            return None
+
+    async def _get_windows_window_bounds(self) -> Optional[Tuple[int, int, int, int]]:
+        """Get active window bounds for Windows using Win32 API."""
+        try:
+            import win32gui
+            import win32con
+        except ImportError:
+            if self.debug_output:
+                print("pywin32 not installed. Install with: pip install pywin32")
+            return None
+
+        def get_window_bounds():
+            hwnd = win32gui.GetForegroundWindow()
+            rect = win32gui.GetWindowRect(hwnd)
+            x = rect[0]
+            y = rect[1]
+            w = rect[2] - x
+            h = rect[3] - y
+            return x, y, w, h
+
+        # Run in threadpool since win32gui is not async
+        return await asyncio.to_thread(get_window_bounds)
+
+    async def _get_linux_window_bounds(self) -> Optional[Tuple[int, int, int, int]]:
+        """Get active window bounds for Linux using xdotool."""
+        try:
+            process = await asyncio.create_subprocess_exec(
+                "xdotool", "getactivewindow", "getwindowgeometry",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            
+            stdout, stderr = await process.communicate()
+            
+            if process.returncode != 0:
+                if self.debug_output:
+                    print("xdotool not installed. Install with: sudo apt-get install xdotool")
+                return None
+                
+            # Parse xdotool output
+            # Example output:
+            # Window 123456789 (focused window):
+            #   Position: 100,200 (screen: 0)
+            #   Geometry: 800x600
+            output = stdout.decode()
+            
+            position_line = [line for line in output.split('\n') if "Position:" in line][0]
+            geometry_line = [line for line in output.split('\n') if "Geometry:" in line][0]
+            
+            x, y = map(int, position_line.split(':')[1].split('(')[0].strip().split(','))
+            w, h = map(int, geometry_line.split(':')[1].strip().split('x'))
+            
+            return x, y, w, h
+            
+        except Exception as e:
+            if self.debug_output:
+                print(f"Error getting Linux window bounds: {e}")
+            return None
 
     @timeit_decorator
     async def analyze_image(self, base64_image: str) -> str:
