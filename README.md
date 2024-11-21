@@ -239,5 +239,18 @@ To add a new agency:
 ### Windows
 - No additional system packages required
 
-## Python Requirements
-See requirements.txt for Python package dependencies.
+## Development
+
+### Adding Dependencies
+
+To add new dependencies:
+```bash
+# Add runtime dependencies
+uv pip install -e .
+
+# Add a specific package
+uv add package_name
+
+# Add a development package
+uv add --dev package_name
+```
