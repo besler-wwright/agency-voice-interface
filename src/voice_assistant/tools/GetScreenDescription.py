@@ -4,9 +4,10 @@ import io
 import os
 import sys
 import tempfile
-from typing import Optional, Tuple, ClassVar
+from typing import ClassVar, Optional, Tuple
 
 import aiohttp
+import pygame
 from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
 from PIL import Image
@@ -84,6 +85,8 @@ class GetScreenDescription(BaseTool):
                 screenshot_path = tmp_file.name
                 if self.debug_output:
                     c.print(f"Screenshot file: {screenshot_path}")
+
+            
 
             # Get window bounds
             bounds = await self._get_active_window_bounds()
@@ -229,6 +232,10 @@ class GetScreenDescription(BaseTool):
             y = rect[1]
             w = rect[2] - x
             h = rect[3] - y
+            if x < 0:
+                x = 0
+            if y < 0:
+                y = 0
             return x, y, w, h
 
         # Run in threadpool since win32gui is not async
