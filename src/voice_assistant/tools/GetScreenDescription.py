@@ -3,13 +3,16 @@ import base64
 import io
 import os
 import tempfile
+from calendar import c
 
 import aiohttp
 from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
+from loguru import logger
 from PIL import Image
 from PIL.Image import Resampling
 from pydantic import Field
+from rich.console import Console
 
 from voice_assistant.models import ModelName
 from voice_assistant.utils.decorators import timeit_decorator
@@ -23,7 +26,9 @@ class GetScreenDescription(BaseTool):
     """Get a text description of the user's active window."""
 
     prompt: str = Field(..., description="Prompt to analyze the screenshot")
+    debug_output: bool = True
 
+    @logger.catch
     async def run(self) -> str:
         """Execute the screen description tool."""
         screenshot_path = await self.take_screenshot()
@@ -38,6 +43,7 @@ class GetScreenDescription(BaseTool):
 
         return analysis
 
+    @logger.catch
     @timeit_decorator
     async def take_screenshot(self) -> str:
         """Capture a screenshot of the active window."""
@@ -62,10 +68,13 @@ class GetScreenDescription(BaseTool):
         stdout, stderr = await process.communicate()
 
         if process.returncode != 0:
-            raise RuntimeError(f"screencapture failed: {stderr.decode().strip()}")
+            raise RuntimeError(f"take_screenshot: screencapture failed: {stderr.decode().strip()}")
 
         if not os.path.exists(screenshot_path):
-            raise FileNotFoundError(f"Screenshot was not created at {screenshot_path}")
+            raise FileNotFoundError(f"take_screenshot Screenshot was not created at {screenshot_path}")
+
+        if self.debug_output:
+            print(f"take_screenshot: Screenshot created at {screenshot_path}")
 
         return screenshot_path
 
@@ -95,6 +104,10 @@ class GetScreenDescription(BaseTool):
         )
 
         stdout, stderr = await process.communicate()
+        if self.debug_output:
+            c=Console()
+            c.print(f"[bold green]stdout: {stdout.decode()}[/bold green]")
+            c.print(f"[bold red]stderr: {stderr.decode()}[/bold red]")
 
         if process.returncode != 0:
             return None, None
@@ -171,6 +184,10 @@ class GetScreenDescription(BaseTool):
 if __name__ == "__main__":
 
     async def test_tool():
+        #clear the console
+        import os
+        os.system('cls' if os.name == 'nt' else 'clear') # clear the screen
+        
         tool = GetScreenDescription(prompt="What do you see in this screenshot? Describe the main elements.")
         try:
             result = await tool.run()
