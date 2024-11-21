@@ -37,7 +37,8 @@ class OpenBrowser(BaseTool):
             logger.info(f"📖 open_browser() Opening URL: {self.url}")
             loop = asyncio.get_running_loop()
             with ThreadPoolExecutor() as pool:
-                await loop.run_in_executor(pool, webbrowser.get(browser).open, self.url)
+                # await loop.run_in_executor(pool, webbrowser.get(browser).open, self.url)
+                await loop.run_in_executor(pool, webbrowser.open, self.url)
             return {"status": "Browser opened", "url": self.url}
         return {"status": "No URL found"}
 

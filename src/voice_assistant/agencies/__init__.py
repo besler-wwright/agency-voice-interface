@@ -5,6 +5,7 @@ from rich.console import Console
 
 from voice_assistant.tools.registry import AgenciesRegistry
 
+
 def initialize_registry():
     """Initialize the registry with all available agencies."""
     registry = AgenciesRegistry()
@@ -21,12 +22,10 @@ def initialize_registry():
                 agency = getattr(agency_module, "agency")
                 description = f"Agency with agents: {', '.join(agent.name for agent in agency.agents)}"
                 registry.register(agency_folder, agency, description)
-                c.print("\t[green]Agency loaded successfully.[/green]")
+                c.print("\t[green]Agency registered successfully.[/green]")
             except (ImportError, AttributeError) as e:
                 c.print(f"Error loading agency {agency_folder}: {e}")
 
-    # Print available agencies for debugging
-    print("Available Agencies and Agents:\n", registry.agencies_string)
     return registry
 
 # Initialize the registry when this module is imported

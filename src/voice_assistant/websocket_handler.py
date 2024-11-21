@@ -44,9 +44,7 @@ async def process_ws_messages(websocket, mic, visual_interface, tools):
                             json.loads(function_call_args) if function_call_args else {}
                         )
                     except json.JSONDecodeError:
-                        logger.error(
-                            f"Failed to parse function arguments: {function_call_args}"
-                        )
+                        logger.error(f"Failed to parse function arguments: {function_call_args}")
                         args = {}
 
                     tool = next(
@@ -58,22 +56,14 @@ async def process_ws_messages(websocket, mic, visual_interface, tools):
                         None,
                     )
                     if tool:
-                        logger.info(
-                            f"🛠️ Calling function: {function_name} with args: {args}"
-                        )
+                        logger.info(f"🛠️ Calling function: {function_name} with args: {args}")
                         try:
                             tool_instance = tool(**args)  # type: ignore
                             result = await tool_instance.run() # type: ignore
-                            logger.info(
-                                f"🛠️ Function {function_name} call result: {result}"
-                            )
+                            logger.info(f"🛠️ Function {function_name} call result: {result}")
                         except Exception as e:
-                            logger.error(
-                                f"Error calling function {function_name}: {str(e)}"
-                            )
-                            result = {
-                                "error": f"Function '{function_name}' failed: {str(e)}"
-                            }
+                            logger.error(f"Error calling function {function_name}: {str(e)}")
+                            result = {"error": f"Function '{function_name}' failed: {str(e)}"}
                     else:
                         logger.warning(f"Function '{function_name}' not found in available tools")
                         result = {"error": f"Function '{function_name}' not found."}

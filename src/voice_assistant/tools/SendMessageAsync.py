@@ -14,7 +14,8 @@ from agency_swarm.threads.thread_async import ThreadAsync
 from agency_swarm.tools import BaseTool
 from pydantic import Field
 
-from voice_assistant.agencies import AGENCIES, AGENCIES_AND_AGENTS_STRING
+# from voice_assistant.agencies import AGENCIES, AGENCIES_AND_AGENTS_STRING
+from voice_assistant.agencies import registry
 from voice_assistant.utils.decorators import timeit_decorator
 
 logger = logging.getLogger(__name__)
@@ -45,7 +46,8 @@ class SendMessageAsync(BaseTool):
         return str(result)
 
     async def send_message(self) -> str:
-        agency: Agency | None = AGENCIES.get(self.agency_name)
+        # agency: Agency | None = AGENCIES.get(self.agency_name)
+        agency: Agency | None = registry.get_agency(self.agency_name)
         if not agency:
             return f"Agency '{self.agency_name}' not found"
 
@@ -79,10 +81,12 @@ class SendMessageAsync(BaseTool):
 
 # Dynamically update the class docstring with the list of agencies and their agents
 if SendMessageAsync.__doc__:
-    SendMessageAsync.__doc__ = SendMessageAsync.__doc__.format(agency_agents=AGENCIES_AND_AGENTS_STRING)
+    # SendMessageAsync.__doc__ = SendMessageAsync.__doc__.format(agency_agents=AGENCIES_AND_AGENTS_STRING)
+    SendMessageAsync.__doc__ = SendMessageAsync.__doc__.format(agency_agents=registry.agencies_string)
 
 
 if __name__ == "__main__":
+    
     tool = SendMessageAsync(
         message="Write a long paragraph about the history of the internet.",
         agency_name="ResearchAgency",
@@ -90,9 +94,10 @@ if __name__ == "__main__":
     )
     print(asyncio.run(tool.run()))
 
-    tool = SendMessageAsync(
-        message="Write a long paragraph about the history of the internet.",
-        agency_name="ResearchAgency",
-        agent_name=None,
-    )
-    print(asyncio.run(tool.run()))
+    # Commented by Wade as I think this is some weird junk left from the original code
+    # tool = SendMessageAsync(
+    #     message="Write a long paragraph about the history of the internet.",
+    #     agency_name="ResearchAgency",
+    #     agent_name=None,
+    # )
+    # print(asyncio.run(tool.run()))

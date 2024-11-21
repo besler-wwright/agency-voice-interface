@@ -6,6 +6,7 @@ import os
 
 import pygame
 import websockets
+from rich.console import Console
 from websockets.exceptions import ConnectionClosedError
 
 from voice_assistant.config import (
@@ -15,7 +16,8 @@ from voice_assistant.config import (
     SILENCE_THRESHOLD,
 )
 from voice_assistant.microphone import AsyncMicrophone
-from voice_assistant.tools import load_tools, prepare_tool_schemas
+from voice_assistant.tools import load_tools, prepare_tool_schemas, registry
+from voice_assistant.tools.registry import AgenciesRegistry
 from voice_assistant.utils import base64_encode_audio
 from voice_assistant.utils.log_utils import log_ws_event
 from voice_assistant.visual_interface import VisualInterface, run_visual_interface
@@ -33,6 +35,9 @@ logger = logging.getLogger(__name__)
 async def realtime_api(tool_schemas, tools):
     while True:
         try:
+            c=Console()
+            
+            
             api_key = os.getenv("OPENAI_API_KEY")
             if not api_key:
                 logger.error("Please set the OPENAI_API_KEY in your .env file.")
@@ -48,6 +53,9 @@ async def realtime_api(tool_schemas, tools):
 
             mic = AsyncMicrophone()
             visual_interface = VisualInterface()
+
+            registry = AgenciesRegistry()
+            c.print( f"[bold yellow]Available Agencies and Agents:[/bold yellow]\n{registry.agencies_string}")
 
             async with websockets.connect(url, extra_headers=headers) as websocket:
                 logger.info("Connected to the server.")
