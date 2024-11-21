@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import io
+import logging
 import os
 import sys
 import tempfile
@@ -32,6 +33,10 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 class GetScreenDescription(BaseTool):
     """Get a text description of the user's active window."""
+
+    SCREENSHOT_FORMAT = ".png"
+    SCREENSHOT_TIMEOUT = 10  # seconds
+    MAX_SCREENSHOT_SIZE = 10 * 1024 * 1024  # 10MB
 
     prompt: str = Field(..., description="Prompt to analyze the screenshot")
     debug_output: bool = True
@@ -76,7 +81,7 @@ class GetScreenDescription(BaseTool):
             c.print("Taking screenshot...")
 
             # Create temporary file
-            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp_file:
+            with tempfile.NamedTemporaryFile(suffix=self.SCREENSHOT_FORMAT, delete=False) as tmp_file:
                 screenshot_path = tmp_file.name
                 c.print(f"Screenshot file: {screenshot_path}")
 
@@ -85,20 +90,29 @@ class GetScreenDescription(BaseTool):
             if not bounds:
                 raise WindowBoundsError("Failed to retrieve active window bounds")
 
+            # Validate bounds
+            self._validate_bounds(bounds)
+
             x, y, width, height = bounds
             c.print(f"Window bounds: {x}, {y}, {width}, {height}")
             
             # Execute screenshot command
+            cmd = self._get_screenshot_command(x, y, width, height)
             process = await asyncio.create_subprocess_exec(
-                "screencapture",
-                "-R",
-                f"{x},{y},{width},{height}",
+                *cmd,
                 screenshot_path,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
 
-            stdout, stderr = await process.communicate()
+            try:
+                stdout, stderr = await asyncio.wait_for(
+                    process.communicate(), 
+                    timeout=self.SCREENSHOT_TIMEOUT
+                )
+            except asyncio.TimeoutError:
+                process.kill()
+                raise ScreenCaptureError("Screenshot capture timed out")
 
             if process.returncode != 0:
                 error_msg = stderr.decode().strip()
@@ -107,8 +121,11 @@ class GetScreenDescription(BaseTool):
             if not os.path.exists(screenshot_path):
                 raise ScreenCaptureError(f"Screenshot file not created at {screenshot_path}")
 
-            if os.path.getsize(screenshot_path) == 0:
+            file_size = os.path.getsize(screenshot_path)
+            if file_size == 0:
                 raise ScreenCaptureError("Screenshot file is empty")
+            if file_size > self.MAX_SCREENSHOT_SIZE:
+                raise ScreenCaptureError("Screenshot file too large")
 
             Console().print(f"Screenshot created successfully at {screenshot_path}")
             return screenshot_path
@@ -213,6 +230,30 @@ class GetScreenDescription(BaseTool):
 
         # Run in threadpool since win32gui is not async
         return await asyncio.to_thread(get_window_bounds)
+
+    def _validate_bounds(self, bounds: Tuple[int, int, int, int]) -> None:
+        """
+        Validate window bounds are reasonable.
+        
+        Args:
+            bounds: Tuple of (x, y, width, height)
+            
+        Raises:
+            WindowBoundsError: If bounds are invalid
+        """
+        x, y, width, height = bounds
+        if width <= 0 or height <= 0:
+            raise WindowBoundsError("Invalid window dimensions")
+        if x < 0 or y < 0:
+            raise WindowBoundsError("Invalid window position")
+
+    def _get_screenshot_command(self, x: int, y: int, width: int, height: int) -> Tuple[str, ...]:
+        """Generate screenshot command for current platform."""
+        return (
+            "screencapture",
+            "-R",
+            f"{x},{y},{width},{height}"
+        )
 
     async def _get_linux_window_bounds(self) -> Optional[Tuple[int, int, int, int]]:
         """Get active window bounds for Linux using xdotool."""
