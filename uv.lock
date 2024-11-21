@@ -1,9 +1,12 @@
 version = 1
 requires-python = ">=3.12"
 resolution-markers = [
-    "python_full_version >= '4.0'",
-    "python_full_version < '3.13'",
-    "python_full_version >= '3.13' and python_full_version < '4.0'",
+    "python_full_version >= '4.0' and sys_platform == 'win32'",
+    "python_full_version >= '4.0' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform != 'win32'",
+    "python_full_version >= '3.13' and python_full_version < '4.0' and sys_platform == 'win32'",
+    "python_full_version >= '3.13' and python_full_version < '4.0' and sys_platform != 'win32'",
 ]
 
 [[package]]
@@ -1736,7 +1739,7 @@ dependencies = [
     { name = "pyobjc-framework-quartz", marker = "sys_platform == 'darwin'" },
     { name = "pyscreenshot" },
     { name = "python-dotenv" },
-    { name = "pywin32", marker = "sys_platform == 'win32'" },
+    { name = "pywin32" },
     { name = "requests" },
     { name = "rich" },
     { name = "selenium" },
@@ -1782,6 +1785,7 @@ requires-dist = [
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.5" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "pywin32", specifier = ">=308" },
     { name = "pywin32", marker = "sys_platform == 'win32'" },
     { name = "requests", specifier = ">=2.25.0" },
     { name = "rich", specifier = ">=13.7.1" },

@@ -28,6 +28,7 @@ dependencies = [
     "pyobjc-framework-Quartz; sys_platform == 'darwin'",
     "pyscreenshot>=3.1",
     "pyautogui>=0.9.54",
+    "pywin32>=308",
 ]
 
 [build-system]
