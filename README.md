@@ -167,3 +167,28 @@ To add a new agency:
 - [WebSockets Library for Python](https://websockets.readthedocs.io/)
 - [PyAudio Documentation](https://people.csail.mit.edu/hubert/pyaudio/docs/)
 - [Pygame Documentation](https://www.pygame.org/docs/)
+# Voice Assistant
+
+## System Requirements
+
+### Linux
+- xdotool: Required for window management on Linux
+  ```bash
+  # Ubuntu/Debian
+  sudo apt-get install xdotool
+
+  # Fedora
+  sudo dnf install xdotool
+
+  # Arch Linux
+  sudo pacman -S xdotool
+  ```
+
+### macOS
+- No additional system packages required
+
+### Windows
+- No additional system packages required
+
+## Python Requirements
+See requirements.txt for Python package dependencies.

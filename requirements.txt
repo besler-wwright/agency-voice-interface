@@ -1,1 +1,13 @@
+# Core dependencies
+aiohttp
+pillow
+pydantic
+python-dotenv
+loguru
+rich
+
+# Platform-specific dependencies
 pywin32; sys_platform == 'win32'  # For Windows support
+
+# Optional dependencies
+agency-swarm  # For BaseTool functionality
