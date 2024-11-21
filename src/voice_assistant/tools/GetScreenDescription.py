@@ -9,14 +9,13 @@ from typing import Optional, Tuple
 import aiohttp
 from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
-from loguru import logger
 from PIL import Image
 from PIL.Image import Resampling
 from pydantic import Field
+from pyparsing import C
 from rich.console import Console
 
 from voice_assistant.models import ModelName
-from voice_assistant.utils.decorators import timeit_decorator
 
 
 class ScreenCaptureError(Exception):
@@ -73,9 +72,13 @@ class GetScreenDescription(BaseTool):
             OSError: If file operations fail
         """
         try:
+            c = Console()
+            c.print("Taking screenshot...")
+
             # Create temporary file
             with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp_file:
                 screenshot_path = tmp_file.name
+                c.print(f"Screenshot file: {screenshot_path}")
 
             # Get window bounds
             bounds = await self._get_active_window_bounds()
@@ -83,6 +86,7 @@ class GetScreenDescription(BaseTool):
                 raise WindowBoundsError("Failed to retrieve active window bounds")
 
             x, y, width, height = bounds
+            c.print(f"Window bounds: {x}, {y}, {width}, {height}")
             
             # Execute screenshot command
             process = await asyncio.create_subprocess_exec(
@@ -106,7 +110,7 @@ class GetScreenDescription(BaseTool):
             if os.path.getsize(screenshot_path) == 0:
                 raise ScreenCaptureError("Screenshot file is empty")
 
-            logger.debug(f"Screenshot created successfully at {screenshot_path}")
+            Console().print(f"Screenshot created successfully at {screenshot_path}")
             return screenshot_path
 
         except (WindowBoundsError, ScreenCaptureError) as e:
@@ -119,7 +123,7 @@ class GetScreenDescription(BaseTool):
             # Clean up file if it exists
             if 'screenshot_path' in locals() and os.path.exists(screenshot_path):
                 await asyncio.to_thread(os.remove, screenshot_path)
-            logger.exception("Unexpected error during screenshot capture")
+            Console().print("Unexpected error during screenshot capture")
             raise ScreenCaptureError(f"Screenshot capture failed: {str(e)}") from e
 
     async def _get_active_window_bounds(self) -> Optional[Tuple[int, int, int, int]]:
@@ -246,7 +250,7 @@ class GetScreenDescription(BaseTool):
                 print(f"Error getting Linux window bounds: {e}")
             return None
 
-    @timeit_decorator
+    
     async def analyze_image(self, base64_image: str) -> str:
         """Send the encoded image and prompt to the OpenAI API for analysis."""
         headers = {
