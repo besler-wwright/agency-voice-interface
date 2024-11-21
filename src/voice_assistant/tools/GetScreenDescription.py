@@ -63,91 +63,121 @@ class GetScreenDescription(BaseTool):
             if screenshot_path and os.path.exists(screenshot_path):
                 await asyncio.to_thread(os.remove, screenshot_path)
 
-    async def take_screenshot(self) -> str:
-        """
-        Capture a screenshot of the active window.
+    # async def take_screenshot(self) -> str:
+    #     """
+    #     Capture a screenshot of the active window.
         
-        Returns:
-            str: Path to the temporary screenshot file
+    #     Returns:
+    #         str: Path to the temporary screenshot file
             
-        Raises:
-            WindowBoundsError: If unable to get active window bounds
-            ScreenCaptureError: If screenshot capture fails
-            OSError: If file operations fail
-        """
+    #     Raises:
+    #         WindowBoundsError: If unable to get active window bounds
+    #         ScreenCaptureError: If screenshot capture fails
+    #         OSError: If file operations fail
+    #     """
+    #     try:
+    #         c = Console()
+    #         if self.debug_output:
+    #             c.print("Taking screenshot...")
+
+    #         # Create temporary file
+    #         with tempfile.NamedTemporaryFile(suffix=self.SCREENSHOT_FORMAT, delete=False) as tmp_file:
+    #             screenshot_path = tmp_file.name
+    #             if self.debug_output:
+    #                 c.print(f"Screenshot file: {screenshot_path}")
+
+            
+
+    #         # Get window bounds
+    #         bounds = await self._get_active_window_bounds()
+    #         if not bounds:
+    #             raise WindowBoundsError("Failed to retrieve active window bounds")
+
+    #         # Validate bounds
+    #         self._validate_bounds(bounds)
+
+    #         x, y, width, height = bounds
+    #         if self.debug_output:
+    #             c.print(f"Window bounds: {x}, {y}, {width}, {height}")
+            
+    #         # Execute screenshot command
+    #         cmd = self._get_screenshot_command(x, y, width, height)
+    #         if self.debug_output:
+    #             c.print(f"Executing screenshot command: {cmd}")
+    #         process = await asyncio.create_subprocess_exec(
+    #             *cmd,
+    #             screenshot_path,
+    #             stdout=asyncio.subprocess.PIPE,
+    #             stderr=asyncio.subprocess.PIPE,
+    #         )
+
+    #         try:
+    #             stdout, stderr = await asyncio.wait_for(
+    #                 process.communicate(), 
+    #                 timeout=self.SCREENSHOT_TIMEOUT
+    #             )
+    #         except asyncio.TimeoutError:
+    #             process.kill()
+    #             raise ScreenCaptureError("Screenshot capture timed out")
+
+    #         if process.returncode != 0:
+    #             error_msg = stderr.decode().strip()
+    #             raise ScreenCaptureError(f"Screenshot capture failed: {error_msg}")
+
+    #         if not os.path.exists(screenshot_path):
+    #             raise ScreenCaptureError(f"Screenshot file not created at {screenshot_path}")
+
+    #         file_size = os.path.getsize(screenshot_path)
+    #         if file_size == 0:
+    #             raise ScreenCaptureError("Screenshot file is empty")
+    #         if file_size > self.MAX_SCREENSHOT_SIZE:
+    #             raise ScreenCaptureError("Screenshot file too large")
+
+    #         Console().print(f"Screenshot created successfully at {screenshot_path}")
+    #         return screenshot_path
+
+    #     except (WindowBoundsError, ScreenCaptureError) as e:
+    #         # Clean up file if it exists
+    #         if 'screenshot_path' in locals() and os.path.exists(screenshot_path):
+    #             await asyncio.to_thread(os.remove, screenshot_path)
+    #         raise
+
+    #     except Exception as e:
+    #         # Clean up file if it exists
+    #         if 'screenshot_path' in locals() and os.path.exists(screenshot_path):
+    #             await asyncio.to_thread(os.remove, screenshot_path)
+    #         Console().print("Unexpected error during screenshot capture")
+    #         raise ScreenCaptureError(f"Screenshot capture failed: {str(e)}") from e
+
+
+    def take_screenshot(self):
+
+        c = Console()
+
+        # Create temporary file
+        with tempfile.NamedTemporaryFile(suffix=self.SCREENSHOT_FORMAT, delete=False) as tmp_file:
+            screenshot_path = tmp_file.name
+            if self.debug_output:
+                c.print(f"Screenshot file: {screenshot_path}")
+        
+        # Detect platform and take screenshot
         try:
-            c = Console()
-            if self.debug_output:
-                c.print("Taking screenshot...")
-
-            # Create temporary file
-            with tempfile.NamedTemporaryFile(suffix=self.SCREENSHOT_FORMAT, delete=False) as tmp_file:
-                screenshot_path = tmp_file.name
-                if self.debug_output:
-                    c.print(f"Screenshot file: {screenshot_path}")
-
+            import platform
+            system = platform.system().lower()
             
+            if system == "windows":
+                import pyautogui
+                screenshot = pyautogui.screenshot(imageFilename=screenshot_path)
+            else:  # Linux, MacOS
+                import pyscreenshot
+                screenshot = pyscreenshot.grab()
+                screenshot.save(screenshot_path)
 
-            # Get window bounds
-            bounds = await self._get_active_window_bounds()
-            if not bounds:
-                raise WindowBoundsError("Failed to retrieve active window bounds")
-
-            # Validate bounds
-            self._validate_bounds(bounds)
-
-            x, y, width, height = bounds
-            if self.debug_output:
-                c.print(f"Window bounds: {x}, {y}, {width}, {height}")
-            
-            # Execute screenshot command
-            cmd = self._get_screenshot_command(x, y, width, height)
-            if self.debug_output:
-                c.print(f"Executing screenshot command: {cmd}")
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                screenshot_path,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-
-            try:
-                stdout, stderr = await asyncio.wait_for(
-                    process.communicate(), 
-                    timeout=self.SCREENSHOT_TIMEOUT
-                )
-            except asyncio.TimeoutError:
-                process.kill()
-                raise ScreenCaptureError("Screenshot capture timed out")
-
-            if process.returncode != 0:
-                error_msg = stderr.decode().strip()
-                raise ScreenCaptureError(f"Screenshot capture failed: {error_msg}")
-
-            if not os.path.exists(screenshot_path):
-                raise ScreenCaptureError(f"Screenshot file not created at {screenshot_path}")
-
-            file_size = os.path.getsize(screenshot_path)
-            if file_size == 0:
-                raise ScreenCaptureError("Screenshot file is empty")
-            if file_size > self.MAX_SCREENSHOT_SIZE:
-                raise ScreenCaptureError("Screenshot file too large")
-
-            Console().print(f"Screenshot created successfully at {screenshot_path}")
             return screenshot_path
-
-        except (WindowBoundsError, ScreenCaptureError) as e:
-            # Clean up file if it exists
-            if 'screenshot_path' in locals() and os.path.exists(screenshot_path):
-                await asyncio.to_thread(os.remove, screenshot_path)
-            raise
-
+            
         except Exception as e:
-            # Clean up file if it exists
-            if 'screenshot_path' in locals() and os.path.exists(screenshot_path):
-                await asyncio.to_thread(os.remove, screenshot_path)
-            Console().print("Unexpected error during screenshot capture")
-            raise ScreenCaptureError(f"Screenshot capture failed: {str(e)}") from e
+            print(f"Error taking screenshot: {str(e)}")
+            return None
 
     async def _get_active_window_bounds(self) -> Optional[Tuple[int, int, int, int]]:
         """
