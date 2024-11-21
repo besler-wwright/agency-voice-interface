@@ -6,14 +6,6 @@ import sys
 import tempfile
 from typing import Optional, Tuple
 
-class ScreenCaptureError(Exception):
-    """Raised when screen capture fails"""
-    pass
-
-class WindowBoundsError(Exception):
-    """Raised when unable to get window bounds"""
-    pass
-
 import aiohttp
 from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
@@ -26,8 +18,16 @@ from rich.console import Console
 from voice_assistant.models import ModelName
 from voice_assistant.utils.decorators import timeit_decorator
 
-load_dotenv()
 
+class ScreenCaptureError(Exception):
+    """Raised when screen capture fails"""
+    pass
+
+class WindowBoundsError(Exception):
+    """Raised when unable to get window bounds"""
+    pass
+
+load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 
@@ -37,7 +37,6 @@ class GetScreenDescription(BaseTool):
     prompt: str = Field(..., description="Prompt to analyze the screenshot")
     debug_output: bool = True
 
-    @logger.catch  
     async def run(self) -> str:
         """
         Execute the screen description tool.
