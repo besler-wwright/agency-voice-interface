@@ -53,7 +53,9 @@ class GetScreenDescription(BaseTool):
         """
         screenshot_path = None
         try:
-            screenshot_path = await self.take_screenshot()
+            screenshot_path = self.take_screenshot()
+            if screenshot_path is None:
+                raise ScreenCaptureError("Screenshot capture failed")
             file_content = await asyncio.to_thread(self._read_file, screenshot_path)
             resized_content = await asyncio.to_thread(self._resize_image, file_content)
             encoded_image = base64.b64encode(resized_content).decode("utf-8")
