@@ -54,16 +54,65 @@ This project demonstrates the use of OpenAI's Realtime API to create an AI assis
 
 ## Setup
 
-### MacOS Installation
+### Installation
 
-1. Install [Python 3.12](https://www.python.org/downloads/macos/).
-2. Install [uv](https://docs.astral.sh/uv/), a modern Python package manager
-3. Clone this repository to your local machine
-4. Create a local environment file `.env` based on `.env.sample`
-5. Customize `personalization.json` and `config.py` to your preferences
-6. Install the required audio library: `brew install portaudio`
-7. Install project dependencies: `uv sync`
-8. Launch the assistant: `uv run main`
+1. Install Python 3.12 from [python.org](https://www.python.org/downloads/)
+
+2. Install UV:
+```bash
+# Unix (macOS, Linux)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows (PowerShell)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+3. Install platform-specific requirements:
+
+#### macOS
+```bash
+brew install portaudio
+```
+
+#### Linux (Ubuntu/Debian)
+```bash
+sudo apt-get update
+sudo apt-get install -y \
+    python3-dev \
+    portaudio19-dev \
+    xdotool
+```
+
+#### Windows
+No additional system packages required.
+
+4. Clone and setup the project:
+```bash
+# Clone repository
+git clone <repository-url>
+cd voice-assistant
+
+# Create virtual environment
+uv venv
+
+# Activate virtual environment
+# Unix (macOS, Linux):
+source .venv/bin/activate
+# Windows:
+.venv\Scripts\activate
+
+# Install dependencies
+uv pip install -e .
+
+# Copy and configure environment file
+cp .env.sample .env
+# Edit .env with your settings
+```
+
+5. Launch the assistant:
+```bash
+voice-assistant
+```
 
 ### Google Cloud API Configuration
 
