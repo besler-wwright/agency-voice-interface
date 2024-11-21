@@ -4,7 +4,7 @@ import io
 import os
 import sys
 import tempfile
-from typing import Optional, Tuple
+from typing import Optional, Tuple, ClassVar
 
 import aiohttp
 from agency_swarm.tools import BaseTool
@@ -32,9 +32,9 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 class GetScreenDescription(BaseTool):
     """Get a text description of the user's active window."""
 
-    SCREENSHOT_FORMAT = ".png"
-    SCREENSHOT_TIMEOUT = 10  # seconds
-    MAX_SCREENSHOT_SIZE = 10 * 1024 * 1024  # 10MB
+    SCREENSHOT_FORMAT: ClassVar[str] = ".png"
+    SCREENSHOT_TIMEOUT: ClassVar[int] = 10  # seconds
+    MAX_SCREENSHOT_SIZE: ClassVar[int] = 10 * 1024 * 1024  # 10MB
 
     prompt: str = Field(..., description="Prompt to analyze the screenshot")
     debug_output: bool = True
