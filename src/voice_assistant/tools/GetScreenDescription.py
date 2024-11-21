@@ -153,7 +153,6 @@ class GetScreenDescription(BaseTool):
 
 
     def take_screenshot(self):
-
         c = Console()
 
         # Create temporary file
@@ -169,16 +168,19 @@ class GetScreenDescription(BaseTool):
             
             if system == "windows":
                 import pyautogui
-                screenshot = pyautogui.screenshot(imageFilename=screenshot_path)
+                screenshot = pyautogui.screenshot()
+                screenshot.save(screenshot_path, format='PNG')
             else:  # Linux, MacOS
-                import pyscreenshot
-                screenshot = pyscreenshot.grab()
-                screenshot.save(screenshot_path)
+                import pyscreenshot as ImageGrab
+                screenshot = ImageGrab.grab()
+                screenshot.convert('RGB').save(screenshot_path, format='PNG')
 
             return screenshot_path
             
         except Exception as e:
             print(f"Error taking screenshot: {str(e)}")
+            if os.path.exists(screenshot_path):
+                os.remove(screenshot_path)
             return None
 
     async def _get_active_window_bounds(self) -> Optional[Tuple[int, int, int, int]]:
