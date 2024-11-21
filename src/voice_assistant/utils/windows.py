@@ -16,7 +16,7 @@ def list_visible_windows():
     win32gui.EnumWindows(enum_window_callback, windows)
     return windows
 
-def list_all_windows(*, visible_only: bool = False, enabled_only: bool = False, non_minimized_only: bool = False, title_contains: str|None = None):
+def list_all_windows(*, visible_only: bool = False, enabled_only: bool = False, non_minimized_only: bool = False, title_contains: str|None = None, console_write_list: bool = False):
     """List windows based on specified filters.
     
     Args:
@@ -57,6 +57,14 @@ def list_all_windows(*, visible_only: bool = False, enabled_only: bool = False, 
             })
     
     win32gui.EnumWindows(enum_window_callback, windows)
+    if console_write_list:
+        c = Console()
+        if title_contains:
+            c.print(f"Windows containing '{title_contains}':")
+        if len(windows) == 0:
+            c.print("No windows found")
+        for window in windows:
+            c.print(window)
     return windows
 
 
@@ -91,27 +99,22 @@ if __name__ == "__main__":
     c = Console()
 
     # List all windows
-    windows = list_all_windows()
-    for window in windows:
-        c.print(window)
+    c.print("\nAll windows:")
+    windows = list_all_windows(console_write_list=True)
 
     # Example filtering
     c.print("\nVisible, non-minimized windows:")
-    filtered_windows = list_all_windows(visible_only=True, non_minimized_only=True)
-    for window in filtered_windows:
-        c.print(window)
+    filtered_windows = list_all_windows(visible_only=True, non_minimized_only=True, console_write_list=True)
         
-        
-    c.print("\nWindows containing 'chrome':")
-    chrome_windows = list_all_windows(title_contains="chrome")
-    for window in chrome_windows:
-        c.print(window)
+    # Example Filtering 2: 
+    chrome_windows = list_all_windows(title_contains="chrome", console_write_list=True)
 
     # Example: Activate a window by title
     search_title = "Notepad"
-    found_notepad = activate_window_by_title(search_title)  # Will activate first window containing "Notepad"
-    c.print(f"found {search_title}: {found_notepad}" )
+    notepad_activated = activate_window_by_title(search_title)  # Will activate first window containing "Notepad"
+    c.print(f"\nactivated [{search_title}]: {notepad_activated}" )
     
     search_title = "Aider"
-    found_aider = activate_window_by_title('Aider:')
-    c.print(f"found [{search_title}]: {found_aider}")
+    aider_windows = list_all_windows(title_contains="Aider", console_write_list=True)
+    aider_activated = activate_window_by_title('Aider')
+    c.print(f"\nactivated [{search_title}]: {aider_activated}")
