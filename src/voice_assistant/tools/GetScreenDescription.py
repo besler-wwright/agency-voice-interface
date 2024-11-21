@@ -172,8 +172,7 @@ class GetScreenDescription(BaseTool):
                 screenshot = pyautogui.screenshot(imageFilename=screenshot_path)
             else:  # Linux, MacOS
                 import pyscreenshot
-                screenshot = pyscreenshot.grab()
-                screenshot.save(screenshot_path)
+                pyscreenshot.grab_to_file(screenshot_path)
 
             return screenshot_path
             
