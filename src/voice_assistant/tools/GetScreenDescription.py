@@ -32,9 +32,9 @@ class GetScreenDescription(BaseTool):
     @logger.catch  
     async def run(self) -> str:
         """Execute the screen description tool."""
-        screenshot_path = await self.take_screenshot()
 
         try:
+            screenshot_path = await self.take_screenshot()
             file_content = await asyncio.to_thread(self._read_file, screenshot_path)
             resized_content = await asyncio.to_thread(self._resize_image, file_content)
             encoded_image = base64.b64encode(resized_content).decode("utf-8")
