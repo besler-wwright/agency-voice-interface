@@ -4,7 +4,6 @@ import io
 import os
 import sys
 import tempfile
-from calendar import c
 from typing import Optional, Tuple
 
 import aiohttp
@@ -30,7 +29,7 @@ class GetScreenDescription(BaseTool):
     prompt: str = Field(..., description="Prompt to analyze the screenshot")
     debug_output: bool = True
 
-    @logger.catch
+    @logger.catch  
     async def run(self) -> str:
         """Execute the screen description tool."""
         screenshot_path = await self.take_screenshot()
@@ -45,8 +44,6 @@ class GetScreenDescription(BaseTool):
 
         return analysis
 
-    @logger.catch
-    @timeit_decorator
     async def take_screenshot(self) -> str:
         """Capture a screenshot of the active window."""
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp_file:
@@ -149,8 +146,8 @@ class GetScreenDescription(BaseTool):
     async def _get_windows_window_bounds(self) -> Optional[Tuple[int, int, int, int]]:
         """Get active window bounds for Windows using Win32 API."""
         try:
-            import win32gui
-            import win32con
+            import win32con  # noqa: F401 # type: ignore
+            import win32gui  # type: ignore
         except ImportError:
             if self.debug_output:
                 print("pywin32 not installed. Install with: pip install pywin32")
@@ -266,8 +263,8 @@ if __name__ == "__main__":
 
     async def test_tool():
         #clear the console
-        import os
-        os.system('cls' if os.name == 'nt' else 'clear') # clear the screen
+        # import os
+        # os.system('cls' if os.name == 'nt' else 'clear') # clear the screen
         
         tool = GetScreenDescription(prompt="What do you see in this screenshot? Describe the main elements.")
         try:

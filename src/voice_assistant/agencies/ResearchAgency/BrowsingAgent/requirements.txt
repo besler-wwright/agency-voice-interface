@@ -1,5 +1,0 @@
-selenium>=4.0.0
-webdriver-manager>=4.0.0
-selenium-stealth>=1.0.0
-beautifulsoup4>=4.9.0  # For HTML parsing
-requests>=2.25.0  # For HTTP requests
