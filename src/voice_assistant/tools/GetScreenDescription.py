@@ -7,15 +7,12 @@ import tempfile
 from typing import ClassVar, Optional, Tuple
 
 import aiohttp
-import pygame
 from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
 from PIL import Image
 from PIL.Image import Resampling
 from pydantic import Field
 from rich.console import Console
-
-from voice_assistant.models import ModelName
 
 
 class ScreenCaptureError(Exception):
@@ -171,10 +168,9 @@ class GetScreenDescription(BaseTool):
                 screenshot = pyautogui.screenshot()
                 screenshot.save(screenshot_path, format='PNG')
             else:  # Linux, MacOS
-                import pyscreenshot as ImageGrab
-                from PIL import Image
-                screenshot: Image.Image = ImageGrab.grab()  # Type hint added
-                screenshot = screenshot.convert('RGB')  # Explicitly convert to RGB
+                from PIL import ImageGrab
+                screenshot = ImageGrab.grab()  # Type hint added
+                screenshot = screenshot.convert('RGB')
                 screenshot.save(screenshot_path, format='PNG')
 
             return screenshot_path
@@ -346,7 +342,7 @@ class GetScreenDescription(BaseTool):
         }
 
         payload = {
-            "model": ModelName.FAST_MODEL,
+            "model": "gpt-4o-mini",  #ModelName.FAST_MODEL,
             "messages": [
                 {
                     "role": "system",
