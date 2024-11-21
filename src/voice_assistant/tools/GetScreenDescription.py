@@ -168,12 +168,14 @@ class GetScreenDescription(BaseTool):
             
             if system == "windows":
                 import pyautogui
-                screenshot = pyautogui.screenshot(imageFilename=screenshot_path)
-                
+                screenshot = pyautogui.screenshot()
+                screenshot.save(screenshot_path, format='PNG')
             else:  # Linux, MacOS
                 import pyscreenshot as ImageGrab
-                screenshot = ImageGrab.grab()
-                screenshot.convert('RGB').save(screenshot_path, format='PNG')
+                from PIL import Image
+                screenshot: Image.Image = ImageGrab.grab()  # Type hint added
+                screenshot = screenshot.convert('RGB')  # Explicitly convert to RGB
+                screenshot.save(screenshot_path, format='PNG')
 
             return screenshot_path
             
