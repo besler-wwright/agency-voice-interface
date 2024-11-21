@@ -5,9 +5,13 @@ pydantic
 python-dotenv
 loguru
 rich
+pygame  # For visual interface
+pyaudio  # For audio handling
+websockets  # For WebSocket communication
 
 # Platform-specific dependencies
 pywin32; sys_platform == 'win32'  # For Windows support
+pyobjc-framework-Quartz; sys_platform == 'darwin'  # For macOS window management
 
 # Optional dependencies
 agency-swarm  # For BaseTool functionality
