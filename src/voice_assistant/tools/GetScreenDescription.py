@@ -76,12 +76,14 @@ class GetScreenDescription(BaseTool):
         """
         try:
             c = Console()
-            c.print("Taking screenshot...")
+            if self.debug_output:
+                c.print("Taking screenshot...")
 
             # Create temporary file
             with tempfile.NamedTemporaryFile(suffix=self.SCREENSHOT_FORMAT, delete=False) as tmp_file:
                 screenshot_path = tmp_file.name
-                c.print(f"Screenshot file: {screenshot_path}")
+                if self.debug_output:
+                    c.print(f"Screenshot file: {screenshot_path}")
 
             # Get window bounds
             bounds = await self._get_active_window_bounds()
@@ -92,10 +94,13 @@ class GetScreenDescription(BaseTool):
             self._validate_bounds(bounds)
 
             x, y, width, height = bounds
-            c.print(f"Window bounds: {x}, {y}, {width}, {height}")
+            if self.debug_output:
+                c.print(f"Window bounds: {x}, {y}, {width}, {height}")
             
             # Execute screenshot command
             cmd = self._get_screenshot_command(x, y, width, height)
+            if self.debug_output:
+                c.print(f"Executing screenshot command: {cmd}")
             process = await asyncio.create_subprocess_exec(
                 *cmd,
                 screenshot_path,
