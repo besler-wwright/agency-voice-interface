@@ -34,3 +34,16 @@ build-backend = "hatchling.build"
 
 [project.scripts]
 voice-assistant = "voice_assistant.main:main"
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.1.1",         # Code formatting
+    "ruff>=0.2.1",          # Fast Python linter
+    "pytest>=8.0.0",        # Testing framework
+    "pytest-asyncio>=0.23.5", # Async test support
+    "pytest-cov>=4.1.0",    # Test coverage
+    "pre-commit>=3.6.0",    # Git hooks
+    "mypy>=1.8.0",          # Type checking
+    "types-requests",        # Type stubs
+    "types-beautifulsoup4"   # Type stubs
+]
