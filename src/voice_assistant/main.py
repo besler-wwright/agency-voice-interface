@@ -16,7 +16,7 @@ from voice_assistant.config import (
     SILENCE_THRESHOLD,
 )
 from voice_assistant.microphone import AsyncMicrophone
-from voice_assistant.tools import load_tools, prepare_tool_schemas, registry
+from voice_assistant.tools import load_tools, prepare_tool_schemas
 from voice_assistant.tools.registry import AgenciesRegistry
 from voice_assistant.utils import base64_encode_audio
 from voice_assistant.utils.log_utils import log_ws_event
