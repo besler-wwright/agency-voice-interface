@@ -78,10 +78,11 @@ def activate_window_by_title(query_title, partial_match=True):
     """
     windows = list_all_windows()
     
-    for hwnd, title in windows:
+    for window in windows:
+        title = window['title']
         if (partial_match and query_title.lower() in title.lower()) or \
            (not partial_match and query_title.lower() == title.lower()):
-            activate_window_by_handle(hwnd)
+            activate_window_by_handle(window['handle'])
             return True
     return False
 
