@@ -1,7 +1,6 @@
 import asyncio
 import base64
 import io
-import logging
 import os
 import sys
 import tempfile
@@ -13,7 +12,6 @@ from dotenv import load_dotenv
 from PIL import Image
 from PIL.Image import Resampling
 from pydantic import Field
-from pyparsing import C
 from rich.console import Console
 
 from voice_assistant.models import ModelName
