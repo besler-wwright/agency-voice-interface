@@ -59,10 +59,10 @@ def list_all_windows(*, visible_only: bool = False, enabled_only: bool = False, 
     win32gui.EnumWindows(enum_window_callback, windows)
     if console_write_list:
         c = Console()
-        if title_contains:
-            c.print(f"Windows containing '{title_contains}':")
-        if len(windows) == 0:
-            c.print("No windows found")
+        if title_contains and console_write_list:
+            c.print(f"\nWindows containing '{title_contains}':")
+        if len(windows) == 0 and console_write_list:
+            c.print("[yellow]No windows found[/yellow]")
         for window in windows:
             c.print(window)
     return windows
@@ -70,6 +70,7 @@ def list_all_windows(*, visible_only: bool = False, enabled_only: bool = False, 
 
 def activate_window_by_handle(hwnd):
     """Activate a window given its handle."""
+    Console().print(f"Activating window with handle {hwnd}")
     if win32gui.IsIconic(hwnd):
         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
     win32gui.SetForegroundWindow(hwnd)
@@ -94,6 +95,7 @@ def activate_window_by_title(query_title, partial_match=True):
             return True
     return False
 
+
 # Example usage
 if __name__ == "__main__":
     c = Console()
@@ -112,9 +114,11 @@ if __name__ == "__main__":
     # Example: Activate a window by title
     search_title = "Notepad"
     notepad_activated = activate_window_by_title(search_title)  # Will activate first window containing "Notepad"
-    c.print(f"\nactivated [{search_title}]: {notepad_activated}" )
+    c.print(f"activated [{search_title}]: {notepad_activated}" )
     
+    # Example - Looking for Aider
     search_title = "Aider"
     aider_windows = list_all_windows(title_contains="Aider", console_write_list=True)
     aider_activated = activate_window_by_title('Aider')
-    c.print(f"\nactivated [{search_title}]: {aider_activated}")
+    c.print(f"activated [{search_title}]: {aider_activated}")
+
