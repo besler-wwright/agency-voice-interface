@@ -10,12 +10,28 @@ def open_powershell_prompt(command: str | None = None, title: str | None = None)
         title: Optional title for the PowerShell window
     """
     if title:
-        base_command = ['wt.exe', 'new-tab', '--title', title, 'pwsh.exe', '-NoProfile', '-NoExit']
+        base_command = [
+            'wt.exe',          # Windows Terminal executable
+            'new-tab',         # Create a new tab instead of new window
+            '--title',         # Specify that next argument is the tab title
+            title,            # The actual title to display
+            'pwsh.exe',       # PowerShell Core executable
+            '-NoProfile',     # Start without loading the PowerShell profile (faster startup)
+            '-NoExit'         # Keep the window open after running commands
+        ]
     else:
-        base_command = ['wt.exe', 'pwsh.exe', '-NoProfile', '-NoExit']
+        base_command = [
+            'wt.exe',         # Windows Terminal executable
+            'pwsh.exe',       # PowerShell Core executable
+            '-NoProfile',     # Start without loading the PowerShell profile (faster startup)
+            '-NoExit'         # Keep the window open after running commands
+        ]
     
     if command:
-        base_command.extend(['-Command', command])
+        base_command.extend([
+            '-Command',       # Specify that what follows is a PowerShell command to execute
+            command          # The actual command to run
+        ])
 
     subprocess.Popen(base_command)
 
