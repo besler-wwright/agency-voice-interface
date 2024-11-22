@@ -13,10 +13,10 @@ def open_terminal(command: str | None = None, title: str | None = None) -> None:
         # Windows Terminal
         if title and command:
             subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', 
-                            f'$host.ui.RawUI.WindowTitle = "{title}"; {command}'])
+                            f'$host.ui.RawUI.WindowTitle = \'{title}\'; {command}'])
         elif title:
             subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', 
-                            f'$host.ui.RawUI.WindowTitle = "{title}"'])
+                            f'$host.ui.RawUI.WindowTitle = \'{title}\''])
         elif command:
             subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', command])
         else:
