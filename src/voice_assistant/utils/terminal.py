@@ -1,5 +1,6 @@
 import subprocess
 
+
 def open_terminal(command: str | None = None, title: str | None = None) -> None:
     """
     Open a new terminal window (Windows Terminal or CMD) with an optional command and title.
@@ -30,13 +31,13 @@ def open_terminal(command: str | None = None, title: str | None = None) -> None:
 # Example usage
 if __name__ == "__main__":
     # Open a simple terminal
-    open_terminal()
+    # open_terminal()
     
     # Or open with a specific command
-    open_terminal("dir")
+    # open_terminal("dir")
     
     # Open with a title
     open_terminal(title="My Terminal")
     
     # Open with both title and command
-    open_terminal("dir", title="Directory Listing")
+    # open_terminal("dir", title="Directory Listing")
