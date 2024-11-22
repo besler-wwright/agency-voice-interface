@@ -1,9 +1,11 @@
 import subprocess
-import win32gui
-import win32con
-import win32process
 import time
-from typing import Optional, Union, TypedDict
+from typing import Optional, TypedDict, Union
+
+import win32con
+import win32gui
+import win32process
+
 
 class ProcessWindowContext(TypedDict, total=False):
     handle: Optional[int]
@@ -197,15 +199,15 @@ if __name__ == "__main__":
     # open_powershell_prompt(title="Process List")  # PowerShell with command and title
     
     # Get handle to Windows Terminal process
-    wt_handle = open_powershell_prompt(
-        title="Nice Terminal",
-        command="Get-Process"
-    )
-    print(f"Windows Terminal process ID: {wt_handle.pid}")
+    # wt_handle = open_powershell_prompt(
+    #     title="Nice Terminal",
+    #     command="Get-Process"
+    # )
+    # print(f"Windows Terminal process ID: {wt_handle.pid}")
     
     # Example of sending text to PowerShell using process handle
     ps = open_powershell_prompt(title="Test PowerShell")
-    time.sleep(1)  # Wait for window to open
+    time.sleep(2)  # Wait for window to open
     
     # Send using process handle
     success = send_text_to_powershell("Get-Process | Select-Object -First 5", ps)
