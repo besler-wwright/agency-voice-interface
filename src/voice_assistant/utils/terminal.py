@@ -12,13 +12,13 @@ def open_terminal(command: str | None = None, title: str | None = None) -> None:
     try:
         # Windows Terminal
         if title and command:
-            subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', 
+            subprocess.Popen(['wt.exe', 'powershell.exe', '-NoProfile', '-NoExit', '-Command', 
                             f'$host.ui.RawUI.WindowTitle = \'{title}\'; {command}'])
         elif title:
-            subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', 
+            subprocess.Popen(['wt.exe', 'powershell.exe', '-NoProfile', '-NoExit', '-Command', 
                             f'$host.ui.RawUI.WindowTitle = \'{title}\''])
         elif command:
-            subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', command])
+            subprocess.Popen(['wt.exe', 'powershell.exe', '-NoProfile', '-NoExit', '-Command', command])
         else:
             subprocess.Popen(['wt.exe'])
     except FileNotFoundError:
