@@ -15,13 +15,13 @@ def open_powershell(command: str | None = None, title: str | None = None) -> Non
     if command:
         commands.append(command)
     
-    ps_init = "Import-Module PSReadLine"
+    ps_init = "Set-ExecutionPolicy -Scope Process Bypass -Force; Import-Module PSReadLine -Force"
     if commands:
         full_command = f"{ps_init}; {'; '.join(commands)}"
     else:
         full_command = ps_init
-        
-    subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', full_command])
+    print(full_command)
+    subprocess.Popen(['wt.exe', 'pwsh.exe', '-NoExit', '-Command', full_command])
 
 
 def open_command_prompt(command: str | None = None, title: str | None = None) -> None:
@@ -56,5 +56,5 @@ if __name__ == "__main__":
     # open_command_prompt("dir", title="Directory Listing")
     
     # Open PowerShell examples
-    # open_powershell()  # Simple PowerShell window
-    open_powershell("Get-Process", title="Process List")  # PowerShell with command and title
+    open_powershell()  # Simple PowerShell window
+    # open_powershell(title="Process List")  # PowerShell with command and title
