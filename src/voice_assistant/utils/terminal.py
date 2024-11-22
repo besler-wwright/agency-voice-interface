@@ -9,18 +9,16 @@ def open_powershell(command: str | None = None, title: str | None = None) -> Non
         command: Optional command to execute in PowerShell. If None, opens an empty shell.
         title: Optional title for the PowerShell window
     """
-    base_command = []
+    base_command = ['pwsh.exe', '-NoProfile', '-NoExit']
     
-    if title:
-        base_command.extend(['pwsh.exe', '-NoProfile', '-NoExit', '-WindowStyle', 'Normal', '-Command', f'$Host.UI.RawUI.WindowTitle=\"{title}\"'])
-    else:
-        base_command.extend(['pwsh.exe', '-NoProfile', '-NoExit'])
-    
-    if command:
+    if title or command:
+        ps_commands = []
         if title:
-            base_command[-1] = f'$Host.UI.RawUI.WindowTitle="{title}"; {command}'
-        else:
-            base_command.extend(['-Command', command])
+            ps_commands.append(f'$env:TITLE="{title}"; $Host.UI.RawUI.WindowTitle=$env:TITLE')
+        if command:
+            ps_commands.append(command)
+        
+        base_command.extend(['-Command', '; '.join(ps_commands)])
 
     subprocess.Popen(['wt.exe'] + base_command)
 
