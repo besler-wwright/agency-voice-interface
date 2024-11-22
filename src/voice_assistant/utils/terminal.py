@@ -1,15 +1,22 @@
 import subprocess
 
-def open_terminal(command: str | None = None) -> None:
+def open_terminal(command: str | None = None, title: str | None = None) -> None:
     """
-    Open a new terminal window (Windows Terminal or CMD) with an optional command.
+    Open a new terminal window (Windows Terminal or CMD) with an optional command and title.
     
     Args:
         command: Optional command to execute in the terminal. If None, opens an empty terminal.
+        title: Optional title for the terminal window (only works with Windows Terminal/PowerShell)
     """
     try:
         # Windows Terminal
-        if command:
+        if title and command:
+            subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', 
+                            f'$host.ui.RawUI.WindowTitle = "{title}"; {command}'])
+        elif title:
+            subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', 
+                            f'$host.ui.RawUI.WindowTitle = "{title}"'])
+        elif command:
             subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', command])
         else:
             subprocess.Popen(['wt.exe'])
@@ -27,3 +34,9 @@ if __name__ == "__main__":
     
     # Or open with a specific command
     open_terminal("dir")
+    
+    # Open with a title
+    open_terminal(title="My Terminal")
+    
+    # Open with both title and command
+    open_terminal("dir", title="Directory Listing")
