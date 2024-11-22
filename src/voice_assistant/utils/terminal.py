@@ -1,12 +1,19 @@
 import subprocess
 import time
-from typing import Any, Dict, Optional, TypedDict, TypeVar, Union
+from typing import Any, Dict, Optional, TypedDict, Union
 
+import pyautogui
 import win32con
 import win32gui
 import win32process
+from black import decode_bytes
 from loguru import logger
 from rich.console import Console
+
+from voice_assistant.utils.windows import (
+    activate_window_by_handle,
+    get_hwnd_for_window_by_title,
+)
 
 
 class ProcessWindowContext(TypedDict, total=False):
@@ -60,131 +67,36 @@ def open_powershell_prompt(command: str | None = None, title: str | None = None)
             command          # The actual command to run
         ])
 
-    return subprocess.Popen(base_command, shell=True)
+    return subprocess.Popen(base_command)
 
-
-def send_text_to_powershell_by_handle(process: subprocess.Popen, text: str) -> bool:
-    """
-    Send text to a PowerShell window using its process handle.
+def send_single_line_to_powershell(text: str, title:str):
     
-    Args:
-        process: The subprocess.Popen handle of the PowerShell window
-        text: The text to send to the PowerShell window
+    hwnd = get_hwnd_for_window_by_title(title, activate_if_found=True)
     
-    Returns:
-        bool: True if text was sent successfully, False otherwise
-    """
-    debug_print(f"Attempting to send text by handle. Process PID: {process.pid}")
-    
-    def find_window_by_pid(hwnd, ctx):
-        if not win32gui.IsWindowVisible(hwnd):
-            return True
-            
-        try:
-            _, window_pid = win32process.GetWindowThreadProcessId(hwnd)
-            # debug_print(f"Checking window. HWND: {hwnd}, PID: {window_pid}")
-            if window_pid == ctx['pid']:
-                ctx['handle'] = hwnd
-                debug_print(f"Found matching window! Handle: {hwnd}")
-                return False
-        except Exception as e:
-            debug_print(f"Error checking window {hwnd}: {str(e)}")
-        return True
-
-    # Context to store the found window handle
-    context: ProcessWindowContext = {'handle': None, 'pid': process.pid}
-    debug_print("Starting window enumeration", context)
-
-    # Find the window associated with the process
-    win32gui.EnumWindows(find_window_by_pid, context)
-    
-    if not context['handle']:
+    if not hwnd or hwnd == 0:
+        print(f"Failed to find PowerShell window with title {title}")
         return False
 
-    # Activate the window
-    win32gui.SetForegroundWindow(context['handle'])
-    time.sleep(0.1)  # Give window time to come to foreground
+    time.sleep(1)  # Give window time to come to foreground
 
-    # Send the text character by character
-    for char in text:
-        win32gui.SendMessage(context['handle'], win32con.WM_CHAR, ord(char), 0)
-    
-    # Send Enter key
-    win32gui.SendMessage(context['handle'], win32con.WM_CHAR, 0x0D, 0)
-    
-    return True
+    pyautogui.write(text)
+    pyautogui.press('enter')
 
-def send_text_to_powershell(text: str, target: Optional[Union[str, subprocess.Popen]] = None) -> bool:
-    """
-    Send text to a PowerShell window.
+def send_multiple_lines_to_powershell(lines: list[str], title:str):
     
-    Args:
-        text: The text to send to the PowerShell window
-        target: Optional target identifier:
-                - If str: treated as window title to search for
-                - If subprocess.Popen: used as process handle
-                - If None: tries to find any PowerShell window
+    hwnd = get_hwnd_for_window_by_title(title, activate_if_found=True)
     
-    Returns:
-        bool: True if text was sent successfully, False otherwise
-    """
-    debug_print(f"send_text_to_powershell called with text: {text[:20]}... and target type: {type(target)}")
-    
-    # If target is a process handle, use the handle-based method
-    if isinstance(target, subprocess.Popen):
-        debug_print("Using handle-based method")
-        return send_text_to_powershell_by_handle(target, text)
-        
-    # Otherwise use the window title based method
-    def find_powershell_window(hwnd, ctx):
-        if not win32gui.IsWindowVisible(hwnd):
-            return True
-        
-        title = win32gui.GetWindowText(hwnd)
-        debug_print(f"Checking window. HWND: {hwnd}, Title: {title}")
-        
-        if not title:
-            return True
-            
-        # If window_title is provided, look for exact match
-        if ctx.get('title'):
-            if ctx['title'] in title:
-                ctx['handle'] = hwnd
-                debug_print(f"Found matching window by title! Handle: {hwnd}")
-                return False
-        # Otherwise look for any PowerShell window
-        elif 'PowerShell' in title:
-            ctx['handle'] = hwnd
-            debug_print(f"Found PowerShell window! Handle: {hwnd}")
-            return False
-        return True
-
-    # Context to store the found window handle
-    context: PowerShellWindowContext = {'handle': None}
-    if isinstance(target, str):
-        context['title'] = target
-        debug_print("Searching for window by title", context)
-    else:
-        debug_print("Searching for any PowerShell window")
-
-    # Find the PowerShell window
-    win32gui.EnumWindows(find_powershell_window, context)
-    
-    if not context['handle']:
+    if not hwnd or hwnd == 0:
+        print(f"Failed to find PowerShell window with title {title}")
         return False
 
-    # Activate the window
-    win32gui.SetForegroundWindow(context['handle'])
-    time.sleep(0.1)  # Give window time to come to foreground
-
-    # Send the text character by character
-    for char in text:
-        win32gui.SendMessage(context['handle'], win32con.WM_CHAR, ord(char), 0)
+    time.sleep(1)  # Give window time to come to foreground
     
-    # Send Enter key
-    win32gui.SendMessage(context['handle'], win32con.WM_CHAR, 0x0D, 0)
+    for line in lines:
+        pyautogui.write(line)
+        pyautogui.press('enter')
+        time.sleep(.1)
     
-    return True
 
 def open_command_prompt(command: str | None = None, title: str | None = None) -> None:
     """
@@ -229,22 +141,9 @@ if __name__ == "__main__":
     # print(f"Windows Terminal process ID: {wt_handle.pid}")
     
     # Example of sending text to PowerShell using process handle
-    title = "Test PowerShell"
-    ps = open_powershell_prompt(title=title)
-    time.sleep(5)  # Wait for window to open
-    Console().print(f"Sending text to PowerShell using process handle... {ps}")
-    
-    # Send using process handle
-    success = send_text_to_powershell("Get-Process | Select-Object -First 5", ps)
-    if success:
-        print("Text sent successfully using handle")
-    else:
-        print("Failed to send text using handle")
-        
-    # Send using window title
-    
-    success = send_text_to_powershell("Get-Date", title)
-    if success:
-        print("Text sent successfully using title")
-    else:
-        print("Failed to send text using title")
+    title = "Aider"
+    process = open_powershell_prompt(title=title)
+    time.sleep(2)  # Wait for window to open
+    send_single_line_to_powershell("Get-Date", title=title) # Send single line
+    # multiple lines
+    send_multiple_lines_to_powershell(["Get-Process | Select-Object -First 5", "Aider"], title=title)

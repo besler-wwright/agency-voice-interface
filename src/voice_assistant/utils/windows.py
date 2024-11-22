@@ -52,7 +52,7 @@ def list_all_windows(*, visible_only: bool = False, enabled_only: bool = False, 
     def enum_window_callback(hwnd, results):
         title = win32gui.GetWindowText(hwnd)
         if title:  # Only include windows with titles
-            visible = win32gui.IsWindowVisible(hwnd)
+            visible = bool(win32gui.IsWindowVisible(hwnd))
             style = win32gui.GetWindowLong(hwnd, win32con.GWL_STYLE)
             enabled = bool(style & win32con.WS_DISABLED == 0)
             minimized = bool(style & win32con.WS_MINIMIZE)
@@ -102,57 +102,42 @@ def activate_window_by_handle(hwnd):
         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
     win32gui.SetForegroundWindow(hwnd)
 
-def activate_window_by_title(query_title, partial_match=True):
-    """Activate first window that matches the given title.
-    
-    Args:
-        query_title (str): Window title to search for
-        partial_match (bool): If True, matches substring. If False, requires exact match.
-                            Case-insensitive in both modes.
-    
-    Returns:
-        bool: True if matching window was found and activated, False if no match found
-        
-    Example:
-        >>> # Activate any window containing "notepad" in title
-        >>> activate_window_by_title("notepad")  # Returns True if found
-        >>> # Activate window with exact title match
-        >>> activate_window_by_title("Untitled - Notepad", partial_match=False)
-    """
+def get_hwnd_for_window_by_title(query_title, partial_match=True, activate_if_found=True):
     windows = list_all_windows()
     
     for window in windows:
         title = window['title']
         if (partial_match and query_title.lower() in title.lower()) or \
            (not partial_match and query_title.lower() == title.lower()):
-            activate_window_by_handle(window['handle'])
-            return True
-    return False
+            if activate_if_found:
+                activate_window_by_handle(window['handle'])
+            return window['handle']
+    return 0
 
 
 # Example usage
 if __name__ == "__main__":
     c = Console()
 
-    # List all windows
+    # # List all windows
     c.print("\nAll windows:")
-    windows = list_all_windows(console_write_list=True)
+    windows = list_all_windows(console_write_list=True, visible_only=True)
 
-    # Example filtering
-    c.print("\nVisible, non-minimized windows:")
-    filtered_windows = list_all_windows(visible_only=True, non_minimized_only=True, console_write_list=True)
+    # # Example filtering
+    # c.print("\nVisible, non-minimized windows:")
+    # filtered_windows = list_all_windows(visible_only=True, non_minimized_only=True, console_write_list=True)
         
-    # Example Filtering 2: 
-    chrome_windows = list_all_windows(title_contains="chrome", console_write_list=True)
+    # # Example Filtering 2: 
+    # chrome_windows = list_all_windows(title_contains="chrome", console_write_list=True)
 
-    # Example: Activate a window by title
-    search_title = "Notepad"
-    notepad_activated = activate_window_by_title(search_title)  # Will activate first window containing "Notepad"
-    c.print(f"activated [{search_title}]: {notepad_activated}" )
+    # # Example: Activate a window by title
+    # search_title = "Notepad"
+    # notepad_activated = activate_window_by_title(search_title)  # Will activate first window containing "Notepad"
+    # c.print(f"activated [{search_title}]: {notepad_activated}" )
     
     # Example - Looking for Aider
     search_title = "Aider"
     aider_windows = list_all_windows(title_contains="Aider", console_write_list=True)
-    aider_activated = activate_window_by_title('Aider')
-    c.print(f"activated [{search_title}]: {aider_activated}")
+    hwnd = get_hwnd_for_window_by_title('Aider')
+    c.print(f"activated [{search_title}]: with handle {hwnd}")
 
