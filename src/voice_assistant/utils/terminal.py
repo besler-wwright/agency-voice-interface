@@ -99,12 +99,12 @@ if __name__ == "__main__":
     # open_powershell_prompt(title="Process List")  # PowerShell with command and title
     
     # Example with process handle
-    ps_handle = open_powershell_prompt(
-        title="Process List", 
-        command="Get-Process", 
-        need_handle=True
-    )
-    print(f"PowerShell process ID: {ps_handle.pid}")
+    # ps_handle = open_powershell_prompt(
+    #     title="Process List", 
+    #     command="Get-Process", 
+    #     need_handle=True
+    # )
+    # print(f"PowerShell process ID: {ps_handle.pid}")
     
     # Can now use ps_handle to interact with the actual PowerShell process
     # ps_handle.wait()  # Wait for process to complete
