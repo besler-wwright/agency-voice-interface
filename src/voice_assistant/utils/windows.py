@@ -4,7 +4,15 @@ from rich.console import Console
 
 
 def list_visible_windows():
-    """List all visible window titles and handles."""
+    """List all visible window titles and handles.
+    
+    Returns:
+        list: A list of tuples containing (window_handle, window_title) for all visible windows.
+        
+    Note:
+        This is a simpler version of list_all_windows(). Consider using list_all_windows() 
+        with visible_only=True for more detailed window information.
+    """
     windows = []
     
     def enum_window_callback(hwnd, results):
@@ -17,16 +25,27 @@ def list_visible_windows():
     return windows
 
 def list_all_windows(*, visible_only: bool = False, enabled_only: bool = False, non_minimized_only: bool = False, title_contains: str|None = None, console_write_list: bool = False):
-    """List windows based on specified filters.
+    """List windows based on specified filters with detailed window information.
     
     Args:
         visible_only (bool): If True, only include visible windows
-        enabled_only (bool): If True, only include enabled windows
-        non_minimized_only (bool): If True, exclude minimized windows
+        enabled_only (bool): If True, only include enabled windows (windows that can receive input)
+        non_minimized_only (bool): If True, exclude minimized windows from results
         title_contains (str): If provided, only include windows whose titles contain this string (case-insensitive)
+        console_write_list (bool): If True, prints the results to console using rich formatting
     
     Returns:
-        list: List of dictionaries containing window information that matches all specified filters
+        list: List of dictionaries containing window information that matches all specified filters.
+              Each dictionary contains:
+                - 'handle': Window handle (hwnd)
+                - 'title': Window title text
+                - 'visible': Boolean indicating if window is visible
+                - 'enabled': Boolean indicating if window can receive input
+                - 'minimized': Boolean indicating if window is minimized
+    
+    Example:
+        >>> # Get all visible Chrome windows
+        >>> chrome_windows = list_all_windows(visible_only=True, title_contains="chrome")
     """
     windows = []
     
@@ -69,7 +88,15 @@ def list_all_windows(*, visible_only: bool = False, enabled_only: bool = False, 
 
 
 def activate_window_by_handle(hwnd):
-    """Activate a window given its handle."""
+    """Activate (bring to foreground) a window given its handle.
+    
+    Args:
+        hwnd (int): Window handle to activate
+        
+    Note:
+        If the window is minimized, it will be restored before being brought to the foreground.
+        Prints activation attempt to console using rich formatting.
+    """
     Console().print(f"Activating window with handle {hwnd}")
     if win32gui.IsIconic(hwnd):
         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
@@ -79,11 +106,18 @@ def activate_window_by_title(query_title, partial_match=True):
     """Activate first window that matches the given title.
     
     Args:
-        title (str): Window title to search for
+        query_title (str): Window title to search for
         partial_match (bool): If True, matches substring. If False, requires exact match.
+                            Case-insensitive in both modes.
     
     Returns:
-        bool: True if window was found and activated, False otherwise
+        bool: True if matching window was found and activated, False if no match found
+        
+    Example:
+        >>> # Activate any window containing "notepad" in title
+        >>> activate_window_by_title("notepad")  # Returns True if found
+        >>> # Activate window with exact title match
+        >>> activate_window_by_title("Untitled - Notepad", partial_match=False)
     """
     windows = list_all_windows()
     
