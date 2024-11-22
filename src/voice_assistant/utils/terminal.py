@@ -1,3 +1,4 @@
+import cmd
 import subprocess
 
 
@@ -53,4 +54,5 @@ if __name__ == "__main__":
     
     # Open PowerShell examples
     # open_powershell()  # Simple PowerShell window
-    open_powershell(title="Process List")  # PowerShell with command and title
+    # open_powershell(title="Process List")  # PowerShell with command and title
+    open_powershell(title="Process List", command="Get-Process")  # PowerShell with command and title
