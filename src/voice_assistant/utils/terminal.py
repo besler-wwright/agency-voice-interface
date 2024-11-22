@@ -15,7 +15,7 @@ def open_powershell(command: str | None = None, title: str | None = None) -> Non
     if command:
         commands.append(command)
     
-    ps_init = "Set-ExecutionPolicy -Scope Process Bypass -Force; Import-Module PSReadLine -Force"
+    ps_init = "Set-ExecutionPolicy -Scope Process Bypass -Force"  # Removed PSReadLine import
     if commands:
         full_command = f"{ps_init}; {'; '.join(commands)}"
     else:
