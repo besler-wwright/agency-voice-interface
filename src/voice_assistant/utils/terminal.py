@@ -1,7 +1,7 @@
 import subprocess
 
 
-def open_powershell(command: str | None = None, title: str | None = None) -> None:
+def open_powershell_prompt(command: str | None = None, title: str | None = None) -> None:
     """
     Open a new Windows Terminal PowerShell window with an optional command and title.
     
@@ -52,6 +52,6 @@ if __name__ == "__main__":
     # open_command_prompt("dir", title="Directory Listing")
     
     # Open PowerShell examples
-    # open_powershell()  # Simple PowerShell window
-    # open_powershell(title="Process List")  # PowerShell with command and title
-    open_powershell(title="Process List", command="Get-Process")  # PowerShell with command and title
+    # open_powershell_prompt()  # Simple PowerShell window
+    # open_powershell_prompt(title="Process List")  # PowerShell with command and title
+    open_powershell_prompt(title="Process List", command="Get-Process")  # PowerShell with command and title
