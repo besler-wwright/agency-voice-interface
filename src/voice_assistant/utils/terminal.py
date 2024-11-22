@@ -11,11 +11,13 @@ def open_powershell(command: str | None = None, title: str | None = None) -> Non
     """
     commands = []
     if title:
-        commands.append(f'$host.ui.RawUI.WindowTitle="{title}"')
+        # Escape any quotes in title and wrap the entire expression in single quotes
+        escaped_title = title.replace('"', '`"')
+        commands.append(f'$Host.UI.RawUI.WindowTitle=\'{escaped_title}\'')
     if command:
         commands.append(command)
     
-    ps_init = "Set-ExecutionPolicy -Scope Process Bypass -Force"  # Removed PSReadLine import
+    ps_init = "Set-ExecutionPolicy -Scope Process Bypass -Force"
     if commands:
         full_command = f"{ps_init}; {'; '.join(commands)}"
     else:
