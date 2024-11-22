@@ -13,14 +13,6 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-def debug_print(message: str, context: Optional[Union[Dict[str, Any], ProcessWindowContext, PowerShellWindowContext]] = None) -> None:
-    """Print debug information with optional context"""
-    if context:
-        logging.debug(f"{message} | Context: {context}")
-    else:
-        logging.debug(message)
-
-
 class ProcessWindowContext(TypedDict, total=False):
     handle: Optional[int]
     pid: int
@@ -28,6 +20,13 @@ class ProcessWindowContext(TypedDict, total=False):
 class PowerShellWindowContext(TypedDict, total=False):
     handle: Optional[int]
     title: Optional[str]
+
+def debug_print(message: str, context: Optional[Union[Dict[str, Any], ProcessWindowContext, PowerShellWindowContext]] = None) -> None:
+    """Print debug information with optional context"""
+    if context:
+        logging.debug(f"{message} | Context: {context}")
+    else:
+        logging.debug(message)
 
 
 def open_powershell_prompt(command: str | None = None, title: str | None = None) -> subprocess.Popen:
