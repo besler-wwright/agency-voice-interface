@@ -39,17 +39,17 @@ def open_command_prompt(command: str | None = None, title: str | None = None) ->
 # Example usage
 if __name__ == "__main__":
     # # Open a simple command prompt
-    open_command_prompt()
+    # open_command_prompt()
     
-    # # Or open with a specific command
-    open_command_prompt("dir")
+    # # # Or open with a specific command
+    # open_command_prompt("dir")
     
-    # # Open with a title
-    open_command_prompt(title="My Command Prompt")
+    # # # Open with a title
+    # open_command_prompt(title="My Command Prompt")
     
-    # Open with both title and command
-    open_command_prompt("dir", title="Directory Listing")
+    # # Open with both title and command
+    # open_command_prompt("dir", title="Directory Listing")
     
     # Open PowerShell examples
     open_powershell()  # Simple PowerShell window
-    open_powershell("Get-Process", title="Process List")  # PowerShell with command and title
+    # open_powershell("Get-Process", title="Process List")  # PowerShell with command and title
