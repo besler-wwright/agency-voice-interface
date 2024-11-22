@@ -1,7 +1,7 @@
 import subprocess
 import time
 import logging
-from typing import Optional, TypedDict, Union
+from typing import Optional, TypedDict, Union, Dict, Any
 
 import win32con
 import win32gui
@@ -13,7 +13,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-def debug_print(message: str, context: dict = None) -> None:
+def debug_print(message: str, context: Optional[Dict[str, Any]] = None) -> None:
     """Print debug information with optional context"""
     if context:
         logging.debug(f"{message} | Context: {context}")
