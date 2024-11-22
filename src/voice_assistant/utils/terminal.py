@@ -3,7 +3,15 @@ import win32gui
 import win32con
 import win32process
 import time
-from typing import Optional, Union
+from typing import Optional, Union, TypedDict
+
+class ProcessWindowContext(TypedDict, total=False):
+    handle: Optional[int]
+    pid: int
+
+class PowerShellWindowContext(TypedDict, total=False):
+    handle: Optional[int]
+    title: Optional[str]
 
 
 def open_powershell_prompt(command: str | None = None, title: str | None = None) -> subprocess.Popen:
@@ -70,7 +78,7 @@ def send_text_to_powershell_by_handle(process: subprocess.Popen, text: str) -> b
         return True
 
     # Context to store the found window handle
-    context = {'handle': None, 'pid': process.pid}
+    context: ProcessWindowContext = {'handle': None, 'pid': process.pid}
 
     # Find the window associated with the process
     win32gui.EnumWindows(find_window_by_pid, context)
@@ -130,7 +138,7 @@ def send_text_to_powershell(text: str, target: Optional[Union[str, subprocess.Po
         return True
 
     # Context to store the found window handle
-    context = {'handle': None}
+    context: PowerShellWindowContext = {'handle': None}
     if isinstance(target, str):
         context['title'] = target
 
