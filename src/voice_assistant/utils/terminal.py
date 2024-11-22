@@ -1,10 +1,24 @@
 import subprocess
 import time
+import logging
 from typing import Optional, TypedDict, Union
 
 import win32con
 import win32gui
 import win32process
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+def debug_print(message: str, context: dict = None) -> None:
+    """Print debug information with optional context"""
+    if context:
+        logging.debug(f"{message} | Context: {context}")
+    else:
+        logging.debug(message)
 
 
 class ProcessWindowContext(TypedDict, total=False):
@@ -65,22 +79,26 @@ def send_text_to_powershell_by_handle(process: subprocess.Popen, text: str) -> b
     Returns:
         bool: True if text was sent successfully, False otherwise
     """
+    debug_print(f"Attempting to send text by handle. Process PID: {process.pid}")
+    
     def find_window_by_pid(hwnd, ctx):
         if not win32gui.IsWindowVisible(hwnd):
             return True
             
-        # Get the process ID for the window
         try:
             _, window_pid = win32process.GetWindowThreadProcessId(hwnd)
+            debug_print(f"Checking window. HWND: {hwnd}, PID: {window_pid}")
             if window_pid == ctx['pid']:
                 ctx['handle'] = hwnd
-                return False  # Stop enumeration
-        except:
-            pass
+                debug_print(f"Found matching window! Handle: {hwnd}")
+                return False
+        except Exception as e:
+            debug_print(f"Error checking window {hwnd}: {str(e)}")
         return True
 
     # Context to store the found window handle
     context: ProcessWindowContext = {'handle': None, 'pid': process.pid}
+    debug_print("Starting window enumeration", context)
 
     # Find the window associated with the process
     win32gui.EnumWindows(find_window_by_pid, context)
@@ -115,34 +133,44 @@ def send_text_to_powershell(text: str, target: Optional[Union[str, subprocess.Po
     Returns:
         bool: True if text was sent successfully, False otherwise
     """
+    debug_print(f"send_text_to_powershell called with text: {text[:20]}... and target type: {type(target)}")
+    
     # If target is a process handle, use the handle-based method
     if isinstance(target, subprocess.Popen):
+        debug_print("Using handle-based method")
         return send_text_to_powershell_by_handle(target, text)
         
     # Otherwise use the window title based method
     def find_powershell_window(hwnd, ctx):
         if not win32gui.IsWindowVisible(hwnd):
-            return
+            return True
         
         title = win32gui.GetWindowText(hwnd)
+        debug_print(f"Checking window. HWND: {hwnd}, Title: {title}")
+        
         if not title:
-            return
+            return True
             
         # If window_title is provided, look for exact match
         if ctx.get('title'):
             if ctx['title'] in title:
                 ctx['handle'] = hwnd
-                return False  # Stop enumeration
+                debug_print(f"Found matching window by title! Handle: {hwnd}")
+                return False
         # Otherwise look for any PowerShell window
         elif 'PowerShell' in title:
             ctx['handle'] = hwnd
-            return False  # Stop enumeration
+            debug_print(f"Found PowerShell window! Handle: {hwnd}")
+            return False
         return True
 
     # Context to store the found window handle
     context: PowerShellWindowContext = {'handle': None}
     if isinstance(target, str):
         context['title'] = target
+        debug_print("Searching for window by title", context)
+    else:
+        debug_print("Searching for any PowerShell window")
 
     # Find the PowerShell window
     win32gui.EnumWindows(find_powershell_window, context)
