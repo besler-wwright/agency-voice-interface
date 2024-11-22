@@ -1,7 +1,7 @@
 import subprocess
 import time
 import logging
-from typing import Optional, TypedDict, Union, Dict, Any
+from typing import Optional, TypedDict, Union, Dict, Any, TypeVar
 
 import win32con
 import win32gui
@@ -13,7 +13,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-def debug_print(message: str, context: Optional[Dict[str, Any]] = None) -> None:
+def debug_print(message: str, context: Optional[Union[Dict[str, Any], ProcessWindowContext, PowerShellWindowContext]] = None) -> None:
     """Print debug information with optional context"""
     if context:
         logging.debug(f"{message} | Context: {context}")
