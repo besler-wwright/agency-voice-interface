@@ -1,21 +1,24 @@
 import subprocess
 
-
-def open_terminal():
-    """Open a new Windows Terminal window."""
+def open_terminal(command: str | None = None) -> None:
+    """
+    Open a new terminal window (Windows Terminal or CMD) with an optional command.
+    
+    Args:
+        command: Optional command to execute in the terminal. If None, opens an empty terminal.
+    """
     try:
-        # Try Windows Terminal first
-        subprocess.Popen(['wt.exe'])
+        # Windows Terminal
+        if command:
+            subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', command])
+        else:
+            subprocess.Popen(['wt.exe'])
     except FileNotFoundError:
-        # Fall back to Command Prompt if Windows Terminal isn't available
-        subprocess.Popen(['cmd.exe'])
-
-def open_terminal_with_command(command):
-    """Open a new Windows Terminal window and execute a command."""
-    try:
-        subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', command])
-    except FileNotFoundError:
-        subprocess.Popen(['cmd.exe', '/k', command])
+        # Fallback to Command Prompt
+        if command:
+            subprocess.Popen(['cmd.exe', '/k', command])
+        else:
+            subprocess.Popen(['cmd.exe'])
 
 # Example usage
 if __name__ == "__main__":
@@ -23,4 +26,4 @@ if __name__ == "__main__":
     open_terminal()
     
     # Or open with a specific command
-    open_terminal_with_command("dir")
+    open_terminal("dir")
