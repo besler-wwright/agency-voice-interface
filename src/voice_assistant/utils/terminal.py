@@ -1,6 +1,24 @@
 import subprocess
 
 
+def open_powershell(command: str | None = None, title: str | None = None) -> None:
+    """
+    Open a new Windows Terminal PowerShell window with an optional command and title.
+    
+    Args:
+        command: Optional command to execute in PowerShell. If None, opens an empty shell.
+        title: Optional title for the PowerShell window
+    """
+    if title and command:
+        subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', f'$host.ui.RawUI.WindowTitle="{title}"; {command}'])
+    elif title:
+        subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', f'$host.ui.RawUI.WindowTitle="{title}"'])
+    elif command:
+        subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', command])
+    else:
+        subprocess.Popen(['wt.exe', 'powershell.exe'])
+
+
 def open_command_prompt(command: str | None = None, title: str | None = None) -> None:
     """
     Open a new Windows Terminal command prompt with an optional command and title.
@@ -31,3 +49,7 @@ if __name__ == "__main__":
     
     # Open with both title and command
     open_command_prompt("dir", title="Directory Listing")
+    
+    # Open PowerShell examples
+    open_powershell()  # Simple PowerShell window
+    open_powershell("Get-Process", title="Process List")  # PowerShell with command and title
