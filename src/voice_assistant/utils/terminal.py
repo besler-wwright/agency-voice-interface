@@ -45,7 +45,7 @@ def open_command_prompt(command: str | None = None, title: str | None = None) ->
         title: Optional title for the command prompt window
     """
     if title and command:
-        subprocess.Popen(['wt.exe', 'cmd.exe', '/k', f'title {title} && {command}'])
+        subprocess.Popen(['wt.exe', 'cmd.exe', '/k', f'title {title} && {command}']) #/k keeps the window open
     elif title:
         subprocess.Popen(['wt.exe', 'cmd.exe', '/k', f'title {title}'])
     elif command:
