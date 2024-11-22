@@ -9,14 +9,15 @@ def open_powershell(command: str | None = None, title: str | None = None) -> Non
         command: Optional command to execute in PowerShell. If None, opens an empty shell.
         title: Optional title for the PowerShell window
     """
+    ps_init = "Import-Module PSReadLine; "
     if title and command:
-        subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', f'$host.ui.RawUI.WindowTitle="{title}"; {command}'])
+        subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', f'{ps_init}$host.ui.RawUI.WindowTitle="{title}"; {command}'])
     elif title:
-        subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', f'$host.ui.RawUI.WindowTitle="{title}"'])
+        subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', f'{ps_init}$host.ui.RawUI.WindowTitle="{title}"'])
     elif command:
-        subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', command])
+        subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', f'{ps_init}{command}'])
     else:
-        subprocess.Popen(['wt.exe', 'powershell.exe'])
+        subprocess.Popen(['wt.exe', 'powershell.exe', '-NoExit', '-Command', ps_init])
 
 
 def open_command_prompt(command: str | None = None, title: str | None = None) -> None:
