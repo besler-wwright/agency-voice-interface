@@ -12,7 +12,7 @@ def open_powershell(command: str | None = None, title: str | None = None) -> Non
     base_command = []
     
     if title:
-        base_command.extend(['pwsh.exe', '-NoProfile', '-NoExit', '-WindowStyle', 'Normal', '-Command', f'$Host.UI.RawUI.WindowTitle="{title}"'])
+        base_command.extend(['pwsh.exe', '-NoProfile', '-NoExit', '-WindowStyle', 'Normal', '-Command', f'$Host.UI.RawUI.WindowTitle=\"{title}\"'])
     else:
         base_command.extend(['pwsh.exe', '-NoProfile', '-NoExit'])
     
