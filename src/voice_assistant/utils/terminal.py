@@ -14,7 +14,9 @@ def open_powershell(command: str | None = None, title: str | None = None) -> Non
     if title or command:
         ps_commands = []
         if title:
-            ps_commands.append(f'$env:TITLE="{title}"; $Host.UI.RawUI.WindowTitle=$env:TITLE')
+            # Escape any quotes in the title and use a simpler title setting approach
+            escaped_title = title.replace('"', '""')
+            ps_commands.append(f'$Host.UI.RawUI.WindowTitle = "{escaped_title}"')
         if command:
             ps_commands.append(command)
         
