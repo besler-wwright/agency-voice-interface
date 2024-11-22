@@ -9,21 +9,20 @@ def open_powershell(command: str | None = None, title: str | None = None) -> Non
         command: Optional command to execute in PowerShell. If None, opens an empty shell.
         title: Optional title for the PowerShell window
     """
-    commands = []
-    if title:
-        # Escape any quotes in title and wrap the entire expression in single quotes
-        escaped_title = title.replace('"', '`"')
-        commands.append(f'$Host.UI.RawUI.WindowTitle=\'{escaped_title}\'')
-    if command:
-        commands.append(command)
+    base_command = []
     
-    ps_init = "Set-ExecutionPolicy -Scope Process Bypass -Force"
-    if commands:
-        full_command = f"{ps_init}; {'; '.join(commands)}"
+    if title:
+        base_command.extend(['pwsh.exe', '-NoProfile', '-NoExit', '-WindowStyle', 'Normal', '-Command', f'$Host.UI.RawUI.WindowTitle="{title}"'])
     else:
-        full_command = ps_init
-    print(full_command)
-    subprocess.Popen(['wt.exe', 'pwsh.exe', '-NoExit', '-Command', full_command])
+        base_command.extend(['pwsh.exe', '-NoProfile', '-NoExit'])
+    
+    if command:
+        if title:
+            base_command[-1] = f'$Host.UI.RawUI.WindowTitle="{title}"; {command}'
+        else:
+            base_command.extend(['-Command', command])
+
+    subprocess.Popen(['wt.exe'] + base_command)
 
 
 def open_command_prompt(command: str | None = None, title: str | None = None) -> None:
