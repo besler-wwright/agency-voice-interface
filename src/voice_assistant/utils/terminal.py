@@ -1,17 +1,13 @@
 import subprocess
 import time
-import logging
-from typing import Optional, TypedDict, Union, Dict, Any, TypeVar
+from typing import Any, Dict, Optional, TypedDict, TypeVar, Union
 
 import win32con
 import win32gui
 import win32process
+from loguru import logger
+from rich.console import Console
 
-# Configure logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
 
 class ProcessWindowContext(TypedDict, total=False):
     handle: Optional[int]
@@ -24,9 +20,9 @@ class PowerShellWindowContext(TypedDict, total=False):
 def debug_print(message: str, context: Optional[Union[Dict[str, Any], ProcessWindowContext, PowerShellWindowContext]] = None) -> None:
     """Print debug information with optional context"""
     if context:
-        logging.debug(f"{message} | Context: {context}")
+        logger.debug(f"{message} | Context: {context}")
     else:
-        logging.debug(message)
+        logger.debug(message)
 
 
 def open_powershell_prompt(command: str | None = None, title: str | None = None) -> subprocess.Popen:
@@ -64,7 +60,7 @@ def open_powershell_prompt(command: str | None = None, title: str | None = None)
             command          # The actual command to run
         ])
 
-    return subprocess.Popen(base_command)
+    return subprocess.Popen(base_command, shell=True)
 
 
 def send_text_to_powershell_by_handle(process: subprocess.Popen, text: str) -> bool:
@@ -86,7 +82,7 @@ def send_text_to_powershell_by_handle(process: subprocess.Popen, text: str) -> b
             
         try:
             _, window_pid = win32process.GetWindowThreadProcessId(hwnd)
-            debug_print(f"Checking window. HWND: {hwnd}, PID: {window_pid}")
+            # debug_print(f"Checking window. HWND: {hwnd}, PID: {window_pid}")
             if window_pid == ctx['pid']:
                 ctx['handle'] = hwnd
                 debug_print(f"Found matching window! Handle: {hwnd}")
@@ -233,8 +229,10 @@ if __name__ == "__main__":
     # print(f"Windows Terminal process ID: {wt_handle.pid}")
     
     # Example of sending text to PowerShell using process handle
-    ps = open_powershell_prompt(title="Test PowerShell")
-    time.sleep(2)  # Wait for window to open
+    title = "Test PowerShell"
+    ps = open_powershell_prompt(title=title)
+    time.sleep(5)  # Wait for window to open
+    Console().print(f"Sending text to PowerShell using process handle... {ps}")
     
     # Send using process handle
     success = send_text_to_powershell("Get-Process | Select-Object -First 5", ps)
@@ -244,7 +242,8 @@ if __name__ == "__main__":
         print("Failed to send text using handle")
         
     # Send using window title
-    success = send_text_to_powershell("Get-Date", "Test PowerShell")
+    
+    success = send_text_to_powershell("Get-Date", title)
     if success:
         print("Text sent successfully using title")
     else:
