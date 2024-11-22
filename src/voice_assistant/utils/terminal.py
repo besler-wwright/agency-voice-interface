@@ -56,5 +56,5 @@ if __name__ == "__main__":
     # open_command_prompt("dir", title="Directory Listing")
     
     # Open PowerShell examples
-    open_powershell()  # Simple PowerShell window
-    # open_powershell("Get-Process", title="Process List")  # PowerShell with command and title
+    # open_powershell()  # Simple PowerShell window
+    open_powershell("Get-Process", title="Process List")  # PowerShell with command and title
