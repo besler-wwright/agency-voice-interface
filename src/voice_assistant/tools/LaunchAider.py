@@ -30,28 +30,34 @@ class LaunchAider(BaseTool):
         try:
             if sys.platform == "win32":
                 # Windows
-                title = await get_aider_window_title()
-                open_powershell_prompt(title=title)
-                time.sleep(1)  # Wait for window to open
-                lines = [
-                    "Get-Process | Select-Object -First 5", 
-                    "cd /git/agency-voice-interface",
-                    "Remove-Item Env:VSCODE_GIT_IPC_HANDLE",
-                    "aider"
-                    ]
-                send_multiple_lines_to_powershell(lines, title=title)
-                time.sleep(1)  # Wait for aider to start up
-                send_single_line_to_powershell("/read-only .instructions/", title=title)
+                await self.initialize_windows_aider_session()
             else:
                 # Linux/Mac
-                terminal_cmd = "gnome-terminal" if sys.platform.startswith("linux") else "open -a Terminal"
-                cmd = f'cd {os.path.abspath(self.directory)} && aider'
-                subprocess.Popen([terminal_cmd, '--', 'bash', '-c', cmd])
+                self.initialize_linux_aider_session()
                 
             return "Aider launched successfully in a new terminal window"
         except Exception as e:
             Console().print(f"[bold red]Error launching Aider: {str(e)}[/bold red]")
             return f"Failed to launch Aider: {str(e)}"
+
+    def initialize_linux_aider_session(self):
+        terminal_cmd = "gnome-terminal" if sys.platform.startswith("linux") else "open -a Terminal"
+        cmd = f'cd {os.path.abspath(self.directory)} && aider'
+        subprocess.Popen([terminal_cmd, '--', 'bash', '-c', cmd])
+
+    async def initialize_windows_aider_session(self):
+        title = await get_aider_window_title()
+        open_powershell_prompt(title=title)
+        time.sleep(1)  # Wait for window to open
+        lines = [
+                    "Get-Process | Select-Object -First 5", 
+                    "cd /git/agency-voice-interface",
+                    "Remove-Item Env:VSCODE_GIT_IPC_HANDLE",
+                    "aider"
+                    ]
+        send_multiple_lines_to_powershell(lines, title=title)
+        time.sleep(1)  # Wait for aider to start up
+        send_single_line_to_powershell("/read-only .instructions/", title=title)
 
 
 if __name__ == "__main__":
