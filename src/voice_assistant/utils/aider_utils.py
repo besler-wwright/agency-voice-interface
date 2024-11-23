@@ -2,8 +2,8 @@ import subprocess
 import sys
 import time
 
-from .git_utils import get_repository_name
-from .terminal import (
+from voice_assistant.utils.git_utils import get_repository_name
+from voice_assistant.utils.terminal import (
     open_powershell_prompt,
     send_multiple_lines_to_powershell,
     send_single_line_to_powershell,
