@@ -4,6 +4,12 @@ from rich.console import Console
 
 
 def list_visible_windows():
+    """
+    Lists all visible windows on the system.
+    
+    Returns:
+        list: A list of tuples containing (window handle, window title) for all visible windows
+    """
     windows = []
     
     def enum_window_callback(hwnd, results):
@@ -16,6 +22,24 @@ def list_visible_windows():
     return windows
 
 def list_all_windows(*, visible_only: bool = False, enabled_only: bool = False, non_minimized_only: bool = False, title_contains: str|None = None, console_write_list: bool = False):
+    """
+    Lists all windows with optional filtering criteria.
+    
+    Args:
+        visible_only (bool): Only include visible windows if True
+        enabled_only (bool): Only include enabled windows if True
+        non_minimized_only (bool): Exclude minimized windows if True
+        title_contains (str|None): Only include windows whose titles contain this string
+        console_write_list (bool): Print results to console if True
+    
+    Returns:
+        list: A list of dictionaries containing window information with keys:
+            - handle: Window handle
+            - title: Window title
+            - visible: Whether window is visible
+            - enabled: Whether window is enabled
+            - minimized: Whether window is minimized
+    """
     windows = []
     
     def enum_window_callback(hwnd, results):
@@ -57,12 +81,32 @@ def list_all_windows(*, visible_only: bool = False, enabled_only: bool = False, 
 
 
 def activate_window_by_handle(hwnd):
+    """
+    Activates (brings to foreground) a window given its handle.
+    
+    Args:
+        hwnd: Window handle to activate
+        
+    Note:
+        If the window is minimized, it will be restored before being brought to the foreground
+    """
     Console().print(f"Activating window with handle {hwnd}")
     if win32gui.IsIconic(hwnd):
         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
     win32gui.SetForegroundWindow(hwnd)
 
 def get_hwnd_for_window_by_title(query_title, partial_match=True, activate_if_found=True):
+    """
+    Finds and optionally activates a window by its title.
+    
+    Args:
+        query_title (str): The title to search for
+        partial_match (bool): If True, matches substring. If False, requires exact match
+        activate_if_found (bool): If True, brings window to front when found
+    
+    Returns:
+        int: Window handle if found, 0 if not found
+    """
     windows = list_all_windows()
     
     for window in windows:
