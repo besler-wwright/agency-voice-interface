@@ -21,17 +21,15 @@ class LaunchAider(BaseTool):
     A tool to launch Aider in a new terminal prompt window.
     """
 
-    directory: str = Field(
-        default=".",
-        description="The directory to open Aider in. Defaults to current directory."
-    )
+    # directory: str = Field(
+    #     default=".",
+    #     description="The directory to open Aider in. Defaults to current directory."
+    # )
 
     async def run(self) -> str:
         try:
             if sys.platform == "win32":
                 # Windows
-                # cmd = f'start cmd /K "cd /d {os.path.abspath(self.directory)} && aider"'
-                # subprocess.Popen(cmd, shell=True)
                 title = await get_aider_window_title()
                 open_powershell_prompt(title=title)
                 time.sleep(1)  # Wait for window to open
@@ -58,5 +56,4 @@ class LaunchAider(BaseTool):
 
 if __name__ == "__main__":
     tool = LaunchAider()
-    print(asyncio.run(tool.run()))
     print(asyncio.run(tool.run()))
