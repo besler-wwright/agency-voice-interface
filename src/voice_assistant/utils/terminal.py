@@ -1,19 +1,12 @@
+import random
 import subprocess
 import time
 from typing import Any, Dict, Optional, TypedDict, Union
 
 import pyautogui
-import win32con
-import win32gui
-import win32process
-from black import decode_bytes
 from loguru import logger
-from rich.console import Console
 
-from voice_assistant.utils.windows import (
-    activate_window_by_handle,
-    get_hwnd_for_window_by_title,
-)
+from voice_assistant.utils.windows import get_hwnd_for_window_by_title
 
 
 class ProcessWindowContext(TypedDict, total=False):
@@ -131,7 +124,7 @@ if __name__ == "__main__":
     
     # Open PowerShell examples
     # open_powershell_prompt()  # Simple PowerShell window
-    # open_powershell_prompt(title="Process List")  # PowerShell with command and title
+    # open_powershell_prompt(title="Process List", command="Get-Process")  # PowerShell with command and title
     
     # Get handle to Windows Terminal process
     # wt_handle = open_powershell_prompt(
@@ -141,9 +134,14 @@ if __name__ == "__main__":
     # print(f"Windows Terminal process ID: {wt_handle.pid}")
     
     # Example of sending text to PowerShell using process handle
-    title = "Aider"
+    title = f"Aider - {random.randint(0, 1000)}"
     process = open_powershell_prompt(title=title)
-    time.sleep(2)  # Wait for window to open
-    send_single_line_to_powershell("Get-Date", title=title) # Send single line
-    # multiple lines
-    send_multiple_lines_to_powershell(["Get-Process | Select-Object -First 5", "Aider"], title=title)
+    time.sleep(1)  # Wait for window to open
+    lines = [
+        "Get-Process | Select-Object -First 5", 
+        "cd /git/agency-voice-interface",
+        "aider"
+        ]
+    send_multiple_lines_to_powershell(lines, title=title)
+    time.sleep(1)  # Wait for aider to start up
+    send_single_line_to_powershell("/read-only .instructions/", title=title)
