@@ -37,8 +37,6 @@ async def realtime_api(tool_schemas, tools):
     while True:
         try:
             c=Console()
-            
-            
             api_key = os.getenv("OPENAI_API_KEY")
             if not api_key:
                 logger.error("Please set the OPENAI_API_KEY in your .env file.")
