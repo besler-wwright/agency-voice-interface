@@ -9,8 +9,8 @@ from rich.console import Console
 
 from voice_assistant.utils.aider_utils import (
     get_aider_window_title,
+    initialize_linux_aider_session,
     initialize_windows_aider_session,
-    initialize_linux_aider_session
 )
 
 
@@ -26,14 +26,15 @@ class LaunchAider(BaseTool):
 
     async def run(self) -> str:
         try:
+            response = ""
             if sys.platform == "win32":
                 # Windows
-                await initialize_windows_aider_session()
+                response = await initialize_windows_aider_session()
             else:
                 # Linux/Mac
-                initialize_linux_aider_session()
+                response = initialize_linux_aider_session()
                 
-            return "Aider launched successfully in a new terminal window"
+            return response
         except Exception as e:
             Console().print(f"[bold red]Error launching Aider: {str(e)}[/bold red]")
             return f"Failed to launch Aider: {str(e)}"
