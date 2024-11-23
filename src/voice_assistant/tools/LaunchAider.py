@@ -7,7 +7,10 @@ from agency_swarm.tools import BaseTool
 from pydantic import Field
 from rich.console import Console
 
-from voice_assistant.utils.aider_utils import get_aider_window_title, initialize_windows_aider_session
+from voice_assistant.utils.aider_utils import (
+    get_aider_window_title,
+    initialize_windows_aider_session,
+)
 
 
 class LaunchAider(BaseTool):
@@ -36,10 +39,13 @@ class LaunchAider(BaseTool):
 
     def initialize_linux_aider_session(self):
         terminal_cmd = "gnome-terminal" if sys.platform.startswith("linux") else "open -a Terminal"
-        cmd = f'cd {os.path.abspath(self.directory)} && aider'
+        cmd = 'aider'
         subprocess.Popen([terminal_cmd, '--', 'bash', '-c', cmd])
 
 
+if __name__ == "__main__":
+    tool = LaunchAider()
+    print(asyncio.run(tool.run()))
 if __name__ == "__main__":
     tool = LaunchAider()
     print(asyncio.run(tool.run()))
