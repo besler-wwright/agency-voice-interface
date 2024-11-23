@@ -140,6 +140,7 @@ if __name__ == "__main__":
     lines = [
         "Get-Process | Select-Object -First 5", 
         "cd /git/agency-voice-interface",
+        "Remove-Item Env:VSCODE_GIT_IPC_HANDLE",
         "aider"
         ]
     send_multiple_lines_to_powershell(lines, title=title)
