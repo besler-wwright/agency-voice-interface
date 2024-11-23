@@ -1,28 +1,10 @@
 import random
 import subprocess
 import time
-from typing import Any, Dict, Optional, TypedDict, Union
 
 import pyautogui
-from loguru import logger
 
 from voice_assistant.utils.windows import get_hwnd_for_window_by_title
-
-
-class ProcessWindowContext(TypedDict, total=False):
-    handle: Optional[int]
-    pid: int
-
-class PowerShellWindowContext(TypedDict, total=False):
-    handle: Optional[int]
-    title: Optional[str]
-
-def debug_print(message: str, context: Optional[Union[Dict[str, Any], ProcessWindowContext, PowerShellWindowContext]] = None) -> None:
-    """Print debug information with optional context"""
-    if context:
-        logger.debug(f"{message} | Context: {context}")
-    else:
-        logger.debug(message)
 
 
 def open_powershell_prompt(command: str | None = None, title: str | None = None) -> subprocess.Popen:
