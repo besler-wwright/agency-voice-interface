@@ -1,6 +1,7 @@
 from agency_swarm.tools import BaseTool
 from rich.console import Console
-from ..utils.git_utils import get_repository_name
+
+from voice_assistant.utils.git_utils import get_repository_name
 
 
 class GetGitRepoName(BaseTool):
