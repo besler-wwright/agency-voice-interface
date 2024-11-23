@@ -64,7 +64,7 @@ async def realtime_api(tool_schemas, tools):
                     "session": {
                         "modalities": ["text", "audio"],
                         "instructions": SESSION_INSTRUCTIONS,
-                        "voice": RealtimeVoices.VERSE,
+                        "voice": RealtimeVoices.SHIMMER,
                         "input_audio_format": "pcm16",
                         "output_audio_format": "pcm16",
                         "turn_detection": {
