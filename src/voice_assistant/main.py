@@ -66,7 +66,7 @@ async def realtime_api(tool_schemas, tools):
                     "session": {
                         "modalities": ["text", "audio"],
                         "instructions": SESSION_INSTRUCTIONS,
-                        "voice": RealtimeVoices.ALLOY,
+                        "voice": RealtimeVoices.VERSE,
                         "input_audio_format": "pcm16",
                         "output_audio_format": "pcm16",
                         "turn_detection": {
