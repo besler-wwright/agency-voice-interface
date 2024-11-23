@@ -1,4 +1,6 @@
+import time
 from .git_utils import get_repository_name
+from .terminal import open_powershell_prompt, send_multiple_lines_to_powershell, send_single_line_to_powershell
 
 async def get_aider_window_title() -> str:
     """
@@ -9,3 +11,20 @@ async def get_aider_window_title() -> str:
     """
     git_repo_name = await get_repository_name()
     return f"Aider - {git_repo_name}"
+
+async def initialize_windows_aider_session():
+    """
+    Initializes an Aider session in a new PowerShell window on Windows.
+    """
+    title = await get_aider_window_title()
+    open_powershell_prompt(title=title)
+    time.sleep(1)  # Wait for window to open
+    lines = [
+        "Get-Process | Select-Object -First 5", 
+        "cd /git/agency-voice-interface",
+        "Remove-Item Env:VSCODE_GIT_IPC_HANDLE",
+        "aider"
+    ]
+    send_multiple_lines_to_powershell(lines, title=title)
+    time.sleep(1)  # Wait for aider to start up
+    send_single_line_to_powershell("/read-only .instructions/", title=title)
