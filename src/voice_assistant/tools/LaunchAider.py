@@ -9,6 +9,7 @@ from agency_swarm.tools import BaseTool
 from pydantic import Field
 from rich.console import Console
 
+from voice_assistant.utils.git_utils import get_repository_name
 from voice_assistant.utils.terminal import (
     open_powershell_prompt,
     send_multiple_lines_to_powershell,
@@ -32,7 +33,8 @@ class LaunchAider(BaseTool):
                 # Windows
                 # cmd = f'start cmd /K "cd /d {os.path.abspath(self.directory)} && aider"'
                 # subprocess.Popen(cmd, shell=True)
-                title = f"Aider - {random.randint(0, 1000)}"
+                git_repo_name = await get_repository_name()
+                title = f"Aider - {git_repo_name}"
                 open_powershell_prompt(title=title)
                 time.sleep(1)  # Wait for window to open
                 lines = [
@@ -58,4 +60,5 @@ class LaunchAider(BaseTool):
 
 if __name__ == "__main__":
     tool = LaunchAider()
+    print(asyncio.run(tool.run()))
     print(asyncio.run(tool.run()))
