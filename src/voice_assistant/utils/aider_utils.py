@@ -1,3 +1,5 @@
+import subprocess
+import sys
 import time
 from .git_utils import get_repository_name
 from .terminal import open_powershell_prompt, send_multiple_lines_to_powershell, send_single_line_to_powershell
@@ -28,3 +30,11 @@ async def initialize_windows_aider_session():
     send_multiple_lines_to_powershell(lines, title=title)
     time.sleep(1)  # Wait for aider to start up
     send_single_line_to_powershell("/read-only .instructions/", title=title)
+
+def initialize_linux_aider_session():
+    """
+    Initializes an Aider session in a new terminal window on Linux/Mac.
+    """
+    terminal_cmd = "gnome-terminal" if sys.platform.startswith("linux") else "open -a Terminal"
+    cmd = 'aider'
+    subprocess.Popen([terminal_cmd, '--', 'bash', '-c', cmd])
