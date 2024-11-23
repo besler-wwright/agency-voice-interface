@@ -20,6 +20,7 @@ from voice_assistant.tools import load_tools, prepare_tool_schemas
 from voice_assistant.tools.registry import AgenciesRegistry
 from voice_assistant.utils import base64_encode_audio
 from voice_assistant.utils.log_utils import log_ws_event
+from voice_assistant.utils.realtime_utils import RealtimeVoices
 from voice_assistant.visual_interface import VisualInterface, run_visual_interface
 from voice_assistant.websocket_handler import process_ws_messages
 
@@ -65,7 +66,7 @@ async def realtime_api(tool_schemas, tools):
                     "session": {
                         "modalities": ["text", "audio"],
                         "instructions": SESSION_INSTRUCTIONS,
-                        "voice": "alloy",
+                        "voice": RealtimeVoices.ALLOY,
                         "input_audio_format": "pcm16",
                         "output_audio_format": "pcm16",
                         "turn_detection": {
@@ -163,4 +164,5 @@ def main():
 if __name__ == "__main__":
     os.system('cls' if os.name == 'nt' else 'clear') # clear the screen
     print("Press Ctrl+C to exit the program.")
+    main()
     main()

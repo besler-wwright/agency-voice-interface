@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum, auto
+
 
 @dataclass(frozen=True)
 class RealtimeVoices:
@@ -25,3 +25,4 @@ class RealtimeVoices:
             cls.SAGE,
             cls.VERSE
         ]
+        
