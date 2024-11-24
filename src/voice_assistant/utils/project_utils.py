@@ -1,6 +1,7 @@
 import os
-from pathlib import Path
+
 from voice_assistant.utils.git_utils import get_git_root
+
 
 async def get_tools_folder_path() -> str:
     """
@@ -19,3 +20,4 @@ async def get_tools_folder_path() -> str:
             return os.path.join(root, 'tools')
             
     raise FileNotFoundError("No 'tools' folder found in the project directory")
+            
