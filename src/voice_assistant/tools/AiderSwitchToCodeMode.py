@@ -1,9 +1,11 @@
 import asyncio
+
 from agency_swarm.tools import BaseTool
 from rich.console import Console
 
 from voice_assistant.utils.aider_utils import get_aider_instance
 from voice_assistant.utils.terminal import send_single_line_to_powershell
+
 
 class AiderSwitchToCodeMode(BaseTool):
     """
@@ -15,10 +17,10 @@ class AiderSwitchToCodeMode(BaseTool):
         try:
             # Get or create Aider instance
             title = await get_aider_instance()
-            Console().print(f"[bold blue]Aider status: {title}[/bold blue]")
+            Console().print(f"[bold blue]Drivint Aider Instance: {title}[/bold blue]")
             
             # Send the chat-mode command to toggle to code mode
-            send_single_line_to_powershell("/chat-mode", title=title)
+            send_single_line_to_powershell("/chat-mode code", title=title)
             
             return "Switched Aider to code mode"
             
