@@ -119,6 +119,8 @@ def get_hwnd_for_window_by_title(query_title, partial_match=True, activate_if_fo
     return 0
 
 
+
+
 # Example usage
 if __name__ == "__main__":
     c = Console()

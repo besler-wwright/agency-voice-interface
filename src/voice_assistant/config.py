@@ -11,7 +11,7 @@ load_dotenv()
 # Constants
 PREFIX_PADDING_MS = 300
 SILENCE_THRESHOLD = 0.5
-SILENCE_DURATION_MS = 400
+SILENCE_DURATION_MS = 600
 RUN_TIME_TABLE_LOG_JSON = "runtime_time_table.jsonl"
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
