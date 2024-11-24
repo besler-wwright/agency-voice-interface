@@ -4,7 +4,7 @@ import time
 
 import pyautogui
 
-from voice_assistant.utils.windows import get_hwnd_for_window_by_title
+from voice_assistant.utils.windows_utils import get_hwnd_for_window_by_title
 
 
 def open_powershell_prompt(command: str | None = None, title: str | None = None) -> subprocess.Popen:

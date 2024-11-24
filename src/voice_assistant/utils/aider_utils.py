@@ -8,7 +8,7 @@ from voice_assistant.utils.terminal import (
     send_multiple_lines_to_powershell,
     send_single_line_to_powershell,
 )
-from voice_assistant.utils.windows import get_hwnd_for_window_by_title
+from voice_assistant.utils.windows_utils import get_hwnd_for_window_by_title
 
 
 async def generate_aider_window_title() -> str:
