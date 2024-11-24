@@ -2,6 +2,8 @@ import subprocess
 import sys
 import time
 
+from voice_assistant.utils.windows import get_hwnd_for_window_by_title
+
 from voice_assistant.utils.git_utils import get_repository_name
 from voice_assistant.utils.terminal import (
     open_powershell_prompt,
@@ -38,6 +40,23 @@ async def initialize_windows_aider_session()->str:
     send_single_line_to_powershell("/read-only .instructions/", title=title)
     
     return "Aider launched successfully in a new terminal window"
+
+async def get_aider_instance() -> str:
+    """
+    Gets or creates an Aider instance.
+    First checks if an Aider window exists and activates it if found.
+    If no Aider window exists, creates a new instance.
+    
+    Returns:
+        str: Status message indicating what action was taken
+    """
+    title = await generate_aider_window_title()
+    hwnd = get_hwnd_for_window_by_title(title, partial_match=True)
+    
+    if hwnd:
+        return "Existing Aider window activated"
+    else:
+        return await initialize_windows_aider_session()
 
 def initialize_linux_aider_session()->str:
     """
