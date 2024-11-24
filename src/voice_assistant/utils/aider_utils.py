@@ -2,14 +2,13 @@ import subprocess
 import sys
 import time
 
-from voice_assistant.utils.windows import get_hwnd_for_window_by_title
-
 from voice_assistant.utils.git_utils import get_repository_name
 from voice_assistant.utils.terminal import (
     open_powershell_prompt,
     send_multiple_lines_to_powershell,
     send_single_line_to_powershell,
 )
+from voice_assistant.utils.windows import get_hwnd_for_window_by_title
 
 
 async def generate_aider_window_title() -> str:
@@ -30,7 +29,6 @@ async def initialize_windows_aider_session()->str:
     open_powershell_prompt(title=title)
     time.sleep(1)  # Wait for window to open
     lines = [
-        "Get-Process | Select-Object -First 5", 
         "cd /git/agency-voice-interface",
         "Remove-Item Env:VSCODE_GIT_IPC_HANDLE",
         "aider"
@@ -39,7 +37,7 @@ async def initialize_windows_aider_session()->str:
     time.sleep(1)  # Wait for aider to start up
     send_single_line_to_powershell("/read-only .instructions/", title=title)
     
-    return "Aider launched successfully in a new terminal window"
+    return title
 
 async def get_aider_instance() -> str:
     """
@@ -54,7 +52,7 @@ async def get_aider_instance() -> str:
     hwnd = get_hwnd_for_window_by_title(title, partial_match=True)
     
     if hwnd:
-        return "Existing Aider window activated"
+        return title
     else:
         return await initialize_windows_aider_session()
 
