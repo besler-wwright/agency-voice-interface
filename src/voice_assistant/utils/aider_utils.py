@@ -10,7 +10,7 @@ from voice_assistant.utils.terminal import (
 )
 
 
-async def get_aider_window_title() -> str:
+async def generate_aider_window_title() -> str:
     """
     Generates the window title for Aider terminal window.
     
@@ -24,7 +24,7 @@ async def initialize_windows_aider_session()->str:
     """
     Initializes an Aider session in a new PowerShell window on Windows.
     """
-    title = await get_aider_window_title()
+    title = await generate_aider_window_title()
     open_powershell_prompt(title=title)
     time.sleep(1)  # Wait for window to open
     lines = [
