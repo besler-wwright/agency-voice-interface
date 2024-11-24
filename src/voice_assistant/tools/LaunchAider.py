@@ -1,14 +1,10 @@
 import asyncio
-import os
-import subprocess
 import sys
 
 from agency_swarm.tools import BaseTool
-from pydantic import Field
 from rich.console import Console
 
 from voice_assistant.utils.aider_utils import (
-    get_aider_window_title,
     initialize_linux_aider_session,
     initialize_windows_aider_session,
 )
