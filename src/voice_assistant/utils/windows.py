@@ -90,7 +90,7 @@ def activate_window_by_handle(hwnd):
     Note:
         If the window is minimized, it will be restored before being brought to the foreground
     """
-    Console().print(f"Activating window with handle {hwnd}")
+    # Console().print(f"Activating window with handle {hwnd}")
     if win32gui.IsIconic(hwnd):
         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
     win32gui.SetForegroundWindow(hwnd)
