@@ -122,22 +122,6 @@ def get_hwnd_for_window_by_title(query_title, partial_match=True, activate_if_fo
     return 0
 
 
-# def maximize_window_by_handle(hwnd):
-#     """
-#     Maximizes a window given its handle.
-    
-#     Args:
-#         hwnd: Window handle to maximize
-        
-#     Returns:
-#         bool: True if successful, False if the window handle is invalid
-#     """
-#     try:
-#         win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
-#         return True
-#     except Exception:
-#         return False
-
 def maximize_window_by_handle(hwnd):
     """
     Maximize a window given its handle (hwnd)
