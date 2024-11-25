@@ -18,7 +18,7 @@ class MaximizeAider(BaseTool):
     """
     async def run(self) -> str:
         """
-        Find and maximize a window by its title.
+        Find and maximize the aider instance
         
         Returns:
             str: Status message indicating success or failure
