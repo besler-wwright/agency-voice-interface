@@ -2,7 +2,6 @@ import asyncio
 import sys
 
 from agency_swarm.tools import BaseTool
-from pydantic import Field
 from rich.console import Console
 
 from voice_assistant.utils.aider_utils import get_aider_instance
