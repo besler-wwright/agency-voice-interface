@@ -34,4 +34,3 @@ class AiderPrepareToolCreation(BaseTool):
 if __name__ == "__main__":
     tool = AiderPrepareToolCreation()
     Console().print(asyncio.run(tool.run()))
-    Console().print(asyncio.run(tool.run()))
