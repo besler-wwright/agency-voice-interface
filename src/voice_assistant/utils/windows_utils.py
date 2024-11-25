@@ -119,6 +119,21 @@ def get_hwnd_for_window_by_title(query_title, partial_match=True, activate_if_fo
     return 0
 
 
+def maximize_window_by_handle(hwnd):
+    """
+    Maximizes a window given its handle.
+    
+    Args:
+        hwnd: Window handle to maximize
+        
+    Returns:
+        bool: True if successful, False if the window handle is invalid
+    """
+    try:
+        win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
+        return True
+    except Exception:
+        return False
 
 
 # Example usage
@@ -146,4 +161,10 @@ if __name__ == "__main__":
     aider_windows = list_all_windows(title_contains="Aider", console_write_list=True)
     hwnd = get_hwnd_for_window_by_title('Aider')
     c.print(f"activated [{search_title}]: with handle {hwnd}")
+
+    # Example - Maximize a window
+    hwnd = get_hwnd_for_window_by_title('Notepad')
+    if hwnd:
+        maximize_window_by_handle(hwnd)
+        c.print(f"Maximized window with handle {hwnd}")
 
