@@ -70,3 +70,12 @@ def initialize_linux_aider_session()->str:
     cmd = 'aider'
     subprocess.Popen([terminal_cmd, '--', 'bash', '-c', cmd])
     return "Aider launched successfully in a new terminal window"
+
+
+async def tell_aider(message):
+    title = await get_aider_instance()
+        
+    # Send the message to Aider
+    send_single_line_to_powershell(message, title=title)
+    
+    return f"Message sent to Aider: {message}"
