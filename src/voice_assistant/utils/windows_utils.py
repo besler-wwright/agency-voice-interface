@@ -1,6 +1,5 @@
 import time
 
-import win32api
 import win32con
 import win32gui
 from rich.console import Console
@@ -153,61 +152,6 @@ def maximize_window_by_handle(hwnd):
         print(f"Error maximizing window: {e}")
         return False
 
-def move_window_left_monitor(hwnd):
-    """
-    Moves a window to the monitor to the left of its current position.
-    If the window is already on the leftmost monitor, it will wrap to the rightmost monitor.
-    
-    Args:
-        hwnd: Window handle to move
-        
-    Returns:
-        bool: True if successful, False otherwise
-    """
-    try:
-        # Get current window position and size
-        rect = win32gui.GetWindowRect(hwnd)
-        x, y, right, bottom = rect
-        width = right - x
-        height = bottom - y
-
-        # Get the monitor the window is currently on
-        current_monitor = win32gui.MonitorFromWindow(hwnd, win32con.MONITOR_DEFAULTTONEAREST)
-        monitor_info = win32gui.GetMonitorInfo(current_monitor)
-        current_monitor_rect = monitor_info['Monitor']
-        
-        # Get all monitors
-        def callback(hMonitor, hdcMonitor, lprcMonitor, dwData):
-            monitors.append((hMonitor, lprcMonitor))
-            return True
-            
-        monitors = []
-        win32gui.EnumDisplayMonitors(None, None, callback, 0)
-        
-        # Sort monitors by x position
-        monitors.sort(key=lambda m: m[1][0])  # Sort by left edge x position
-        
-        # Find current monitor index
-        current_index = next(i for i, m in enumerate(monitors) if m[0] == current_monitor)
-        
-        # Get target monitor (wrap around to last if we're on first monitor)
-        target_index = current_index - 1 if current_index > 0 else len(monitors) - 1
-        target_monitor = monitors[target_index][1]
-        
-        # Calculate new position
-        monitor_x = target_monitor[0]  # Left edge of target monitor
-        monitor_width = target_monitor[2] - target_monitor[0]  # Width of target monitor
-        
-        # Center the window horizontally on the new monitor
-        new_x = monitor_x + (monitor_width - width) // 2
-        
-        # Move the window
-        win32gui.MoveWindow(hwnd, new_x, y, width, height, True)
-        return True
-        
-    except Exception as e:
-        print(f"Error moving window: {e}")
-        return False
 
 # Example usage
 if __name__ == "__main__":
@@ -216,12 +160,6 @@ if __name__ == "__main__":
     # # List all windows
     c.print("\nAll windows:")
     windows = list_all_windows(console_write_list=True, visible_only=True)
-    
-    # Test moving a window left
-    hwnd = get_hwnd_for_window_by_title('Notepad')
-    if hwnd:
-        move_window_left_monitor(hwnd)
-        c.print(f"Moved window with handle {hwnd} left one monitor")
 
     # # Example filtering
     # c.print("\nVisible, non-minimized windows:")
@@ -241,4 +179,10 @@ if __name__ == "__main__":
     #     maximize_window_by_handle(hwnd)
     #     c.print(f"Maximized window with handle {hwnd}")
 
+    
+    # Example - Maximize a window
+    # hwnd = get_hwnd_for_window_by_title('Notepad')
+    # if hwnd:
+    #     maximize_window_by_handle(hwnd)
+    #     c.print(f"Maximized window with handle {hwnd}")
 

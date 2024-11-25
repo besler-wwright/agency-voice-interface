@@ -27,15 +27,9 @@ class AiderMoveLeft(BaseTool):
             # Ensure there's a small delay before sending keystrokes
             await asyncio.sleep(1)
 
-            pyautogui.hotkey('win', 'ctrl', 'left')                        
-            # pyautogui.keyDown('win')
-            # pyautogui.keyDown('ctrl')
-            # pyautogui.keyDown('left')
-            # time.sleep(0.1)  # Small delay to ensure keys register
-            # pyautogui.keyUp('left')
-            # pyautogui.keyUp('ctrl')
-            # pyautogui.keyUp('win')
-                        
+            # THIS DOES NOT WORK, I DON'T KNOW WHY
+            pyautogui.hotkey('win', 'shift', 'left', interval=0.1)
+                            
             return "Successfully moved left" 
 
         except Exception as e:
