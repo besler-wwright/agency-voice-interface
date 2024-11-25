@@ -20,9 +20,5 @@ class AiderSwitchToAskMode(BaseTool):
             return f"Failed to switch Aider mode: {str(e)}"
         
 if __name__ == "__main__":
-    async def test_tool():
-        tool = AiderSwitchToAskMode()
-        result = await tool.run()
-        Console().print(result)
-
-    asyncio.run(test_tool())
+    tool = AiderSwitchToAskMode()
+    Console().print(asyncio.run(tool.run()))

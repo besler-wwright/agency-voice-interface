@@ -20,16 +20,13 @@ class AiderShutDown(BaseTool):
             str: Status message indicating success or failure
         """
         try:
-            return await tell_aider_one_thing("/exit")
+            await tell_aider_one_thing("/exit") #exit aider
+            return await tell_aider_one_thing("exit") #exit powershell
         except Exception as e:
             Console().print(f"[bold red]Error shutting down Aider: {str(e)}[/bold red]")
             return f"Failed to shut down Aider: {str(e)}"
 
 
 if __name__ == "__main__":
-    async def test_tool():
-        tool = AiderShutDown()
-        result = await tool.run()
-        Console().print(result)
-
-    asyncio.run(test_tool())
+    tool = AiderShutDown()
+    Console().print(asyncio.run(tool.run()))
