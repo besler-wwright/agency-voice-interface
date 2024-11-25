@@ -2,6 +2,8 @@ import subprocess
 import sys
 import time
 
+from rich.console import Console
+
 from voice_assistant.utils.git_utils import get_repository_name
 from voice_assistant.utils.terminal import (
     open_powershell_prompt,
@@ -72,10 +74,21 @@ def initialize_linux_aider_session()->str:
     return "Aider launched successfully in a new terminal window"
 
 
-async def tell_aider(message):
-    title = await get_aider_instance()
+async def tell_aider_one_thing(message):
+    try:
+        title = await get_aider_instance()
+        send_single_line_to_powershell(message, title=title)
         
-    # Send the message to Aider
-    send_single_line_to_powershell(message, title=title)
-    
-    return f"Message sent to Aider: {message}"
+        return f"Message sent to Aider: {message}"
+    except Exception as e:
+        Console().print(f"[bold red]Error sending message to Aider: {str(e)}[/bold red]")
+        return f"Failed to send message to Aider: {str(e)}"
+
+async def tell_aider_several_things(messages :list[str]):
+    try:
+        title = await get_aider_instance()
+        send_multiple_lines_to_powershell(messages, title=title)
+        return "Messages sent to Aider"
+    except Exception as e:
+        Console().print(f"[bold red]Error sending message to Aider: {str(e)}[/bold red]")
+        return f"Failed to send message to Aider: {str(e)}"

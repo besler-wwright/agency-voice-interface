@@ -38,6 +38,3 @@ class LaunchAider(BaseTool):
 if __name__ == "__main__":
     tool = LaunchAider()
     print(asyncio.run(tool.run()))
-if __name__ == "__main__":
-    tool = LaunchAider()
-    print(asyncio.run(tool.run()))

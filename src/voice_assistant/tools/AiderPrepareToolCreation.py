@@ -1,13 +1,13 @@
 import asyncio
 
 from agency_swarm.tools import BaseTool
+from rich.console import Console
 
-from voice_assistant.utils.aider_utils import get_aider_instance
+from voice_assistant.utils.aider_utils import tell_aider_several_things
 from voice_assistant.utils.project_utils import get_tools_folder_path
-from voice_assistant.utils.terminal import send_multiple_lines_to_powershell
 
 
-class AiderCreateToolPreparation(BaseTool):
+class AiderPrepareToolCreation(BaseTool):
     """
     Prepares Aider for creating a new tool by dropping existing files and adding the appropriate ones to generate a new tool. 
     This ensures a clean state before starting tool creation.
@@ -17,7 +17,7 @@ class AiderCreateToolPreparation(BaseTool):
         """
         Sends the commands to the active Aider instance.
         """
-        title = await get_aider_instance()
+        
         tools_path = await get_tools_folder_path()
         
         # Convert to relative path from git root
@@ -28,11 +28,10 @@ class AiderCreateToolPreparation(BaseTool):
             "/read-only .instructions/instructions.md",
             f"/read-only {tools_path}/*.py"
         ]
-        send_multiple_lines_to_powershell(lines, title=title)
-        
-        return "Aider is ready to create a new tool"
+        return await tell_aider_several_things(lines)
 
 
 if __name__ == "__main__":
-    tool = AiderCreateToolPreparation()
-    print(asyncio.run(tool.run()))
+    tool = AiderPrepareToolCreation()
+    Console().print(asyncio.run(tool.run()))
+    Console().print(asyncio.run(tool.run()))

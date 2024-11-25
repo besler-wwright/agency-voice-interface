@@ -4,11 +4,7 @@ from agency_swarm.tools import BaseTool
 from pydantic import Field
 from rich.console import Console
 
-from voice_assistant.utils.aider_utils import (
-    generate_aider_window_title,
-    get_aider_instance,
-)
-from voice_assistant.utils.terminal import send_single_line_to_powershell
+from voice_assistant.utils.aider_utils import tell_aider_one_thing
 
 
 class TellAider(BaseTool):
@@ -25,7 +21,7 @@ class TellAider(BaseTool):
     async def run(self) -> str:
         try:
             # Get or create Aider instance
-            return tell_aider(message)
+            return await tell_aider_one_thing(self.message)
             
         except Exception as e:
             Console().print(f"[bold red]Error sending message to Aider: {str(e)}[/bold red]")
@@ -34,14 +30,7 @@ class TellAider(BaseTool):
 
 
 if __name__ == "__main__":
-    async def test_tool():
-        tool = TellAider(message="Hello Aider!")
-        result = await tool.run()
-        print(result)
+    tool = TellAider(message="/help")
+    Console().print(asyncio.run(tool.run()))
+    
 
-    asyncio.run(test_tool())
-        tool = TellAider(message="Hello Aider!")
-        result = await tool.run()
-        print(result)
-
-    asyncio.run(test_tool())
