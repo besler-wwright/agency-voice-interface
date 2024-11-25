@@ -4,6 +4,7 @@ import os
 
 import pyaudio
 from dotenv import load_dotenv
+from loguru import logger
 
 # Load environment variables
 load_dotenv()
@@ -31,6 +32,12 @@ SESSION_INSTRUCTIONS = personalization.get("assistant_instructions", "").format(
     ai_assistant_name=AI_ASSISTANT_NAME, user_name=USER_NAME
 )
 
+CURRENT_GIT_PROJECT_DIR = personalization.get("current_git_project_dir")
+if not CURRENT_GIT_PROJECT_DIR:
+    error_msg = "CURRENT_GIT_PROJECT_DIR not found in personalization.json"
+    logger.error(error_msg)
+    raise Exception(error_msg)
+
 # Check for required environment variables
 REQUIRED_ENV_VARS = ["OPENAI_API_KEY", "PERSONALIZATION_FILE", "SCRATCH_PAD_DIR"]
 MISSING_VARS = [var for var in REQUIRED_ENV_VARS if not os.getenv(var)]
@@ -40,4 +47,5 @@ if MISSING_VARS:
     )
 
 SCRATCH_PAD_DIR = os.getenv("SCRATCH_PAD_DIR", "./scratchpad")
+os.makedirs(SCRATCH_PAD_DIR, exist_ok=True)
 os.makedirs(SCRATCH_PAD_DIR, exist_ok=True)

@@ -4,6 +4,7 @@ import time
 
 from rich.console import Console
 
+from voice_assistant.config import CURRENT_GIT_PROJECT_DIR
 from voice_assistant.utils.git_utils import get_repository_name
 from voice_assistant.utils.terminal_utils import (
     open_powershell_prompt,
@@ -31,7 +32,7 @@ async def initialize_windows_aider_session()->str:
     open_powershell_prompt(title=title)
     time.sleep(1)  # Wait for window to open
     lines = [
-        "cd /git/agency-voice-interface",
+        f"cd {CURRENT_GIT_PROJECT_DIR}",
         "Remove-Item Env:VSCODE_GIT_IPC_HANDLE",
         "aider"
     ]
@@ -91,4 +92,5 @@ async def tell_aider_several_things(messages :list[str]):
         return "Messages sent to Aider"
     except Exception as e:
         Console().print(f"[bold red]Error sending message to Aider: {str(e)}[/bold red]")
+        return f"Failed to send message to Aider: {str(e)}"
         return f"Failed to send message to Aider: {str(e)}"
