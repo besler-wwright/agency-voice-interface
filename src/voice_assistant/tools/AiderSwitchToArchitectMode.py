@@ -4,7 +4,7 @@ from agency_swarm.tools import BaseTool
 from rich.console import Console
 
 from voice_assistant.utils.aider_utils import get_aider_instance
-from voice_assistant.utils.terminal import send_single_line_to_powershell
+from voice_assistant.utils.terminal_utils import send_single_line_to_powershell
 
 
 class AiderSwitchToArchitectMode(BaseTool):
