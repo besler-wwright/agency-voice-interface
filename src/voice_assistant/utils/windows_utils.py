@@ -1,3 +1,5 @@
+import time
+
 import win32con
 import win32gui
 from rich.console import Console
@@ -119,22 +121,52 @@ def get_hwnd_for_window_by_title(query_title, partial_match=True, activate_if_fo
     return 0
 
 
+# def maximize_window_by_handle(hwnd):
+#     """
+#     Maximizes a window given its handle.
+    
+#     Args:
+#         hwnd: Window handle to maximize
+        
+#     Returns:
+#         bool: True if successful, False if the window handle is invalid
+#     """
+#     try:
+#         win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
+#         return True
+#     except Exception:
+#         return False
+
 def maximize_window_by_handle(hwnd):
     """
-    Maximizes a window given its handle.
+    Maximize a window given its handle (hwnd)
     
     Args:
         hwnd: Window handle to maximize
         
     Returns:
-        bool: True if successful, False if the window handle is invalid
+        bool: True if successful, False otherwise
     """
     try:
-        win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
+        # First make sure the window isn't minimized
+        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+        
+        # Get the window's current placement info
+        placement = win32gui.GetWindowPlacement(hwnd)
+        
+        # Set the window to maximized state
+        new_placement = list(placement)
+        new_placement[1] = win32con.SW_MAXIMIZE
+        win32gui.SetWindowPlacement(hwnd, tuple(new_placement))
+        
+        # Give the window a moment to maximize
+        time.sleep(0.1)
+        
         return True
-    except Exception:
+        
+    except Exception as e:
+        print(f"Error maximizing window: {e}")
         return False
-
 
 # Example usage
 if __name__ == "__main__":
@@ -156,15 +188,10 @@ if __name__ == "__main__":
     # notepad_activated = activate_window_by_title(search_title)  # Will activate first window containing "Notepad"
     # c.print(f"activated [{search_title}]: {notepad_activated}" )
     
-    # Example - Looking for Aider
-    search_title = "Aider"
-    aider_windows = list_all_windows(title_contains="Aider", console_write_list=True)
-    hwnd = get_hwnd_for_window_by_title('Aider')
-    c.print(f"activated [{search_title}]: with handle {hwnd}")
-
     # Example - Maximize a window
-    hwnd = get_hwnd_for_window_by_title('Notepad')
-    if hwnd:
-        maximize_window_by_handle(hwnd)
-        c.print(f"Maximized window with handle {hwnd}")
+    # hwnd = get_hwnd_for_window_by_title('Notepad')
+    # if hwnd:
+    #     maximize_window_by_handle(hwnd)
+    #     c.print(f"Maximized window with handle {hwnd}")
+
 
