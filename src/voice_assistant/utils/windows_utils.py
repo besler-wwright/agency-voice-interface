@@ -1,5 +1,6 @@
 import time
 
+import win32api
 import win32con
 import win32gui
 from rich.console import Console
@@ -168,6 +169,45 @@ def maximize_window_by_handle(hwnd):
         print(f"Error maximizing window: {e}")
         return False
 
+def move_window_left_monitor(hwnd):
+    """
+    Moves a window to the monitor to the left of its current position.
+    If the window is already on the leftmost monitor, it will wrap to the rightmost monitor.
+    
+    Args:
+        hwnd: Window handle to move
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        # Get current window position and size
+        rect = win32gui.GetWindowRect(hwnd)
+        x, y, right, bottom = rect
+        width = right - x
+        height = bottom - y
+        
+        # Get monitor info
+        monitor_info = win32gui.GetMonitorInfo(win32gui.MonitorFromWindow(hwnd))
+        current_monitor = monitor_info['Monitor']
+        
+        # Calculate new position - move window width to the left
+        new_x = x - width
+        
+        # If window would be off screen, wrap to rightmost position
+        if new_x < 0:
+            # Get system metrics for total virtual screen
+            total_width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
+            new_x = total_width - width
+
+        # Move the window
+        win32gui.MoveWindow(hwnd, new_x, y, width, height, True)
+        return True
+        
+    except Exception as e:
+        print(f"Error moving window: {e}")
+        return False
+
 # Example usage
 if __name__ == "__main__":
     c = Console()
@@ -175,6 +215,12 @@ if __name__ == "__main__":
     # # List all windows
     c.print("\nAll windows:")
     windows = list_all_windows(console_write_list=True, visible_only=True)
+    
+    # Test moving a window left
+    hwnd = get_hwnd_for_window_by_title('Notepad')
+    if hwnd:
+        move_window_left_monitor(hwnd)
+        c.print(f"Moved window with handle {hwnd} left one monitor")
 
     # # Example filtering
     # c.print("\nVisible, non-minimized windows:")
