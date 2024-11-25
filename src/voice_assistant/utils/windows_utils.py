@@ -170,20 +170,37 @@ def move_window_left_monitor(hwnd):
         x, y, right, bottom = rect
         width = right - x
         height = bottom - y
-        
-        # Get monitor info
-        monitor_info = win32gui.GetMonitorInfo(win32gui.MonitorFromWindow(hwnd))
-        current_monitor = monitor_info['Monitor']
-        
-        # Calculate new position - move window width to the left
-        new_x = x - width
-        
-        # If window would be off screen, wrap to rightmost position
-        if new_x < 0:
-            # Get system metrics for total virtual screen
-            total_width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
-            new_x = total_width - width
 
+        # Get the monitor the window is currently on
+        current_monitor = win32gui.MonitorFromWindow(hwnd, win32con.MONITOR_DEFAULTTONEAREST)
+        monitor_info = win32gui.GetMonitorInfo(current_monitor)
+        current_monitor_rect = monitor_info['Monitor']
+        
+        # Get all monitors
+        def callback(hMonitor, hdcMonitor, lprcMonitor, dwData):
+            monitors.append((hMonitor, lprcMonitor))
+            return True
+            
+        monitors = []
+        win32gui.EnumDisplayMonitors(None, None, callback, 0)
+        
+        # Sort monitors by x position
+        monitors.sort(key=lambda m: m[1][0])  # Sort by left edge x position
+        
+        # Find current monitor index
+        current_index = next(i for i, m in enumerate(monitors) if m[0] == current_monitor)
+        
+        # Get target monitor (wrap around to last if we're on first monitor)
+        target_index = current_index - 1 if current_index > 0 else len(monitors) - 1
+        target_monitor = monitors[target_index][1]
+        
+        # Calculate new position
+        monitor_x = target_monitor[0]  # Left edge of target monitor
+        monitor_width = target_monitor[2] - target_monitor[0]  # Width of target monitor
+        
+        # Center the window horizontally on the new monitor
+        new_x = monitor_x + (monitor_width - width) // 2
+        
         # Move the window
         win32gui.MoveWindow(hwnd, new_x, y, width, height, True)
         return True
