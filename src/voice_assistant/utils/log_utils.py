@@ -1,6 +1,5 @@
 import json
 import logging
-import sys
 from datetime import datetime
 
 from voice_assistant.config import RUN_TIME_TABLE_LOG_JSON
