@@ -138,6 +138,27 @@ The project relies on environment variables and a `personalization.json` file fo
 - `PERSONALIZATION_FILE`: Path to your customized personalization JSON file
 - `SCRATCH_PAD_DIR`: Directory for temporary file storage
 
+### GitHub Access Token Setup
+
+To use GitHub-related tools, you need to generate a Personal Access Token:
+
+1. Go to GitHub.com and log in
+2. Click your profile picture -> Settings
+3. Scroll down to "Developer settings" (bottom of left sidebar)
+4. Click "Personal access tokens" -> "Tokens (classic)"
+5. Click "Generate new token" -> "Generate new token (classic)"
+6. Give your token a descriptive name in the "Note" field
+7. Select the following scopes:
+   - `repo` (Full control of private repositories)
+8. Click "Generate token"
+9. **Important**: Copy the token immediately - you won't be able to see it again!
+10. Add the token to your `.env` file:
+    ```
+    GITHUB_ACCESS_TOKEN=your_token_here
+    ```
+
+Note: Keep your token secure and never commit it to version control. If you accidentally expose your token, immediately revoke it on GitHub and generate a new one.
+
 ## Usage
 
 After launching the assistant, interact using voice commands. Example interactions:
