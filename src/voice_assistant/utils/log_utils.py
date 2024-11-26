@@ -64,9 +64,9 @@ def log_ws_event(direction: str, event: dict):
     message = f"{emoji} {icon} {event_type}"
 
     # If it's the same event type, update the current line, this gives the appearance of just the time updating
-    if event_type == _last_event_type:
-        sys.stdout.write('\033[F')  # Move cursor up one line
-        sys.stdout.write('\r')
-        sys.stdout.flush()
-    logger.info(message)
+    # if event_type == _last_event_type:
+    #     sys.stdout.write('\033[F')  # Move cursor up one line
+    #     sys.stdout.write('\r')
+    #     sys.stdout.flush()
+    logger.debug(message)
     _last_event_type = event_type

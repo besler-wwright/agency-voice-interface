@@ -29,6 +29,7 @@ dependencies = [
     "pyscreenshot>=3.1",
     "pyautogui>=0.9.54",
     "pywin32>=308",
+    "pygithub>=2.5.0",
 ]
 
 [build-system]
