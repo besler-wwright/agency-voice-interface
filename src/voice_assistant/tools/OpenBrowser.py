@@ -22,8 +22,6 @@ if pf_file_location:
         personalization = json.load(f)
 else:
     raise Exception("PERSONALIZATION_FILE environment variable not set")
-browser = personalization["browser"]
-
 
 class OpenBrowser(BaseTool):
     """Open a browser with a specified URL."""
