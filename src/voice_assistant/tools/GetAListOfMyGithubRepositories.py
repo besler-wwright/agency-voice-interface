@@ -1,8 +1,9 @@
-from agency_swarm.tools import BaseTool
-from pydantic import Field
 import os
+
+from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
 from github import Github
+from pydantic import Field
 
 load_dotenv()
 
@@ -50,3 +51,7 @@ if __name__ == "__main__":
     # Test the tool
     tool = GetAListOfMyGithubRepositories(include_private=True)
     print(tool.run())
+
+    tool = GetAListOfMyGithubRepositories(include_private=False)
+    print(tool.run())
+    
