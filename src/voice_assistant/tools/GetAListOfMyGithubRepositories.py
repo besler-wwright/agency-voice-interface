@@ -1,4 +1,5 @@
 import os
+import asyncio
 
 from agency_swarm.tools import BaseTool
 from dotenv import load_dotenv
@@ -18,7 +19,7 @@ class GetAListOfMyGithubRepositories(BaseTool):
         description="Whether to include private repositories in the list"
     )
 
-    def run(self) -> str:
+    async def run(self) -> str:
         """
         Retrieves and returns a list of GitHub repositories.
         Returns a formatted string containing repository names and their visibility.
@@ -28,15 +29,20 @@ class GetAListOfMyGithubRepositories(BaseTool):
             return "Error: GITHUB_ACCESS_TOKEN not found in environment variables"
 
         try:
-            g = Github(github_token)
-            user = g.get_user()
-            repos = user.get_repos()
-            
-            repo_list = []
-            for repo in repos:
-                if not self.include_private and repo.private:
-                    continue
-                repo_list.append(f"- {repo.name} ({'private' if repo.private else 'public'})")
+            # Run the GitHub API calls in a thread to avoid blocking
+            def get_repos():
+                g = Github(github_token)
+                user = g.get_user()
+                repos = user.get_repos()
+                
+                repo_list = []
+                for repo in repos:
+                    if not self.include_private and repo.private:
+                        continue
+                    repo_list.append(f"- {repo.name} ({'private' if repo.private else 'public'})")
+                return repo_list
+
+            repo_list = await asyncio.to_thread(get_repos)
             
             if not repo_list:
                 return "No repositories found"
@@ -49,9 +55,11 @@ class GetAListOfMyGithubRepositories(BaseTool):
 
 if __name__ == "__main__":
     # Test the tool
-    tool = GetAListOfMyGithubRepositories(include_private=True)
-    print(tool.run())
+    async def test():
+        tool = GetAListOfMyGithubRepositories(include_private=True)
+        print(await tool.run())
 
-    tool = GetAListOfMyGithubRepositories(include_private=False)
-    print(tool.run())
+        tool = GetAListOfMyGithubRepositories(include_private=False)
+        print(await tool.run())
     
+    asyncio.run(test())
